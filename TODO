@@ -1,0 +1,69 @@
+
+#todo Models:
+
+Users:
+    email - emailfield
+    passwd - charfield
+    first name - charfield
+    second name - charfield
+    birth_date - datefield
+    country - django-countries countryfield
+    status - textchoices
+        (depends on their activity:
+         owner (new/experienced/trustworthy),
+         client (new/experienced/trustworthy))
+    passport_scan - filefield
+
+
+Apartment:
+    owner - fk (user)
+    country - charfield
+    state - charfield
+    city - charfield
+    geolocation - ??? (later)
+    description - textarea
+    room_amount - textchoices
+    bedroom_amount - textchoices (bedrooms < rooms)
+    convenience_items - django-multiselectfield (not sure)
+
+    daily_rate - float
+    registry ordering scan - filefield
+    verified - bool (default=False,
+               can only be verified by admin)
+
+ApartmentPhoto:
+    apartment - fk (apartment)
+    photo - imagefield
+
+Reservation:
+    user - fk (user)
+    apartment - fk (apartment)
+    date_created - datetimefield
+    start_date - datetimefield (nearest two months)
+    end_date - datetimefield (nearest two months)
+
+
+Review:
+    user - fk (user)
+    apartment - fk (apartment)
+    thesis - textfield
+    rating - float
+    text - textfield
+
+#todo Basic Views:
+Registration
+Verify email
+Login
+Account detail
+    (different depending on who's visiting the page)
+Change account details (verify if email was changed)
+Logout
+Deactivate (or delete) account
+Add apartment
+Apartment detail (with changing)
+Register a reservation
+Leave a review
+
+Chat with a client/owner (????????)
+
+
