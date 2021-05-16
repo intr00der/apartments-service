@@ -7,6 +7,10 @@ class ApartmentServiceUserManager(BaseUserManager):
     #         self, email, password, first_name,
     #         last_name, gender, country, city
     # ):
+    #     """
+    #     тут я как-то пытался сделать метод сериализации,
+    #     чтобы в методах ниже не повторять код, но пока не получилось
+    #     """
     #     user = self.model(
     #         email=self.normalize_email(email),
     #         password=password,
@@ -51,14 +55,6 @@ class ApartmentServiceUserManager(BaseUserManager):
         #     first_name=first_name, last_name=last_name,
         #     gender=gender, country=country, city=city
         # )
-        print(email)
-        print(password)
-        print(first_name)
-        print(last_name)
-        print(gender)
-        print(country)
-        print(city)
-
         user = self.model(
             email=self.normalize_email(email),
             password=password,
