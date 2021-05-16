@@ -14,41 +14,66 @@ class ApartmentServiceUser(AbstractBaseUser, PermissionsMixin):
     )
 
     email = models.EmailField(
-        unique=True, max_length=255, blank=False
+        unique=True,
+        max_length=255,
+        blank=False
     )
     first_name = models.CharField(
-        _('first name'), max_length=30
+        _('first name'),
+        max_length=30
     )
     last_name = models.CharField(
-        _('last name'), max_length=50
+        _('last name'),
+        max_length=50
     )
     gender = models.CharField(
-        max_length=6, choices=GENDER_CHOICES
+        max_length=6,
+        choices=GENDER_CHOICES
     )
-    born = models.DateTimeField(null=True, blank=True)
-    country = models.CharField(max_length=100)
+    born = models.DateField(
+        null=True,
+        blank=True
+    )
+    country = models.CharField(
+        max_length=100
+    )
     state = models.CharField(
-        max_length=100, null=True, blank=True
+        max_length=100,
+        null=True,
+        blank=True
     )
-    city = models.CharField(max_length=100)
+    city = models.CharField(
+        max_length=100
+    )
+    passport = models.FileField(
+        upload_to='media/passport_scans/',
+        null=True,
+        blank=True
+    )
 
     is_owner = models.BooleanField(
-        _('property owner status'), default=False
+        _('property owner status'),
+        default=False
     )
     is_staff = models.BooleanField(
-        _('staff status'), default=False
+        _('staff status'),
+        default=False
     )
     is_admin = models.BooleanField(
-        _('admin status'), default=False
+        _('admin status'),
+        default=False
     )
     is_superuser = models.BooleanField(
-        _('superuser status'), default=False
+        _('superuser status'),
+        default=False
     )
     is_active = models.BooleanField(
-        _('active'), default=True,
+        _('active'),
+        default=True,
     )
-    date_joined = models.DateTimeField(
-        _('date joined'), default=timezone.now,
+    date_joined = models.DateField(
+        _('date joined'),
+        auto_now_add=True
     )
 
     objects = ApartmentServiceUserManager()
@@ -59,8 +84,3 @@ class ApartmentServiceUser(AbstractBaseUser, PermissionsMixin):
         'last_name', 'gender',
         'country', 'city'
     ]
-
-
-class ApartmentOwnerPassport(models.Model):
-    owner = models.OneToOneField(ApartmentServiceUser, on_delete=models.CASCADE)
-    passport = models.FileField(upload_to='media/passport_scans')
