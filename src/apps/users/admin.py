@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ApartmentServiceUser, ApartmentOwnerPassport
+
+admin.site.register(ApartmentServiceUser)
+admin.site.register(ApartmentOwnerPassport)
+
