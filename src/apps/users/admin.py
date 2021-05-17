@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ApartmentServiceUser
+from .models import User
 
-admin.site.register(ApartmentServiceUser)
+admin.site.register(User)
 

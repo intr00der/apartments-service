@@ -1,70 +1,41 @@
 from django.contrib.auth.base_user import BaseUserManager
 
 
-class ApartmentServiceUserManager(BaseUserManager):
-    #
-    # def serialize_user_data(
-    #         self, email, password, first_name,
-    #         last_name, gender, country, city
-    # ):
-    #     """
-    #     тут я как-то пытался сделать метод сериализации,
-    #     чтобы в методах ниже не повторять код, но пока не получилось
-    #     """
-    #     user = self.model(
-    #         email=self.normalize_email(email),
-    #         password=password,
-    #         first_name=first_name,
-    #         last_name=last_name,
-    #         gender=gender,
-    #         country=country,
-    #         city=city
-    #     )
-    #     user.set_password(password)
-    #     return user
+class UserManager(BaseUserManager):
+    def validate_geo_data(self, country, region, city):
+        if not country or not region or not city:
+            return ValueError('This field is required.')
+        return True
 
-    def create_user(
-            self, email, password, first_name,
-            last_name, gender, country, city
-    ):
-        # user = self.serialize_user_data(
-        #     self, email=email, password=password,
-        #     first_name=first_name, last_name=last_name,
-        #     gender=gender, country=country, city=city
-        # )
+    def create_user(self, email, password, first_name,
+                    last_name, gender, country, region, city):
+        if self.validate_geo_data(self, country=country,
+                                  region=region, city=city):
+            user = self.model(
+                email=self.normalize_email(email),
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                gender=gender,
+                country=country,
+                region=region,
+                city=city
+            )
+            user.set_password(password)
+            user.save(using=self._db)
+            return user
 
+    def create_superuser(self, email, password, first_name,
+                         last_name, gender):
         user = self.model(
             email=self.normalize_email(email),
             password=password,
             first_name=first_name,
             last_name=last_name,
             gender=gender,
-            country=country,
-            city=city
+            is_staff=True,
+            is_superuser=True
         )
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
 
-    def create_superuser(
-            self, email, password, first_name,
-            last_name, gender, country, city
-    ):
-        # user = self.serialize_user_data(
-        #     self, email=email, password=password,
-        #     first_name=first_name, last_name=last_name,
-        #     gender=gender, country=country, city=city
-        # )
-        user = self.model(
-            email=self.normalize_email(email),
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            gender=gender,
-            country=country,
-            city=city
-        )
         user.set_password(password)
-        user.is_superuser = True
-        user.is_staff = True
         user.save(using=self._db)

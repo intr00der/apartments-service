@@ -8,6 +8,7 @@ services:
       cd src &&
       python manage.py makemigrations &&
       python manage.py migrate &&
+      python manage.py cities_light &&
       python manage.py runserver 0.0.0.0:8000
       "
     volumes:
