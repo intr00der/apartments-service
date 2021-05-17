@@ -51,9 +51,6 @@ class Apartment(models.Model):
     country = models.ForeignKey(
         Country, related_name='apartments', on_delete=models.PROTECT
     )
-    region = models.ForeignKey(
-        Region, related_name='apartments', on_delete=models.PROTECT
-    )
     city = models.ForeignKey(
         City, related_name='apartments', on_delete=models.PROTECT
     )
@@ -111,4 +108,4 @@ class Review(models.Model):
     )
 
     def __str__(self):
-        return f'{self.user} - {self.apartment} ({self.rating})'
+        return f'{self.user} - ({self.rating})'

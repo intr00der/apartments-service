@@ -20,9 +20,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     country = models.ForeignKey(
         'apartments.Country', on_delete=models.PROTECT, null=True, blank=True
     )
-    region = models.ForeignKey(
-        'apartments.Region', on_delete=models.PROTECT, null=True, blank=True
-    )
     city = models.ForeignKey(
         'apartments.City', on_delete=models.PROTECT, null=True, blank=True
     )
