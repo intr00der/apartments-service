@@ -17,23 +17,15 @@ class Country(models.Model):
         return self.name
 
 
-class Region(models.Model):
-    name = models.CharField(max_length=100)
-    country = models.ForeignKey(
-        Country, related_name='regions', on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return self.name
-
 class City(models.Model):
     name = models.CharField(max_length=100)
-    region = models.ForeignKey(
-        Region, related_name='cities', on_delete=models.CASCADE
+    country = models.ForeignKey(
+        Country, related_name='cities', on_delete=models.CASCADE
     )
 
     def __str__(self):
         return self.name
+
 
 class Apartment(models.Model):
     class Amount(models.IntegerChoices):
