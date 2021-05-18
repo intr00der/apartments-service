@@ -17,23 +17,15 @@ class Country(models.Model):
         return self.name
 
 
-class Region(models.Model):
-    name = models.CharField(max_length=100)
-    country = models.ForeignKey(
-        Country, related_name='regions', on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return self.name
-
 class City(models.Model):
     name = models.CharField(max_length=100)
-    region = models.ForeignKey(
-        Region, related_name='cities', on_delete=models.CASCADE
+    country = models.ForeignKey(
+        Country, related_name='cities', on_delete=models.CASCADE
     )
 
     def __str__(self):
         return self.name
+
 
 class Apartment(models.Model):
     class Amount(models.IntegerChoices):
@@ -59,9 +51,6 @@ class Apartment(models.Model):
     country = models.ForeignKey(
         Country, related_name='apartments', on_delete=models.PROTECT
     )
-    region = models.ForeignKey(
-        Region, related_name='apartments', on_delete=models.PROTECT
-    )
     city = models.ForeignKey(
         City, related_name='apartments', on_delete=models.PROTECT
     )
@@ -76,7 +65,7 @@ class Apartment(models.Model):
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.country}, {self.region}, {self.city}'
+        return f'{self.country}, {self.city}'
 
 
 class ApartmentPhoto(models.Model):
@@ -103,7 +92,7 @@ class Reservation(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.apartment}' \
-               f'({self.datetime_start} - {self.datetime_end})'
+               f'({self.starts_at} - {self.ends_at})'
 
 
 class Review(models.Model):

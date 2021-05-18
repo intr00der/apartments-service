@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import (
     Country,
-    Region,
     City,
     Apartment,
     ApartmentPhoto,
@@ -11,7 +10,6 @@ from .models import (
 )
 
 admin.site.register(Country)
-admin.site.register(Region)
 admin.site.register(City)
 admin.site.register(Apartment)
 admin.site.register(ApartmentPhoto)

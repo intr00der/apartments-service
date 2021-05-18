@@ -16,12 +16,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=50)
     gender = models.IntegerField(choices=GenderChoices.choices)
-    born = models.DateField(null=True, blank=True)
+    born_at = models.DateField(null=True, blank=True)
     country = models.ForeignKey(
         'apartments.Country', on_delete=models.PROTECT, null=True, blank=True
-    )
-    region = models.ForeignKey(
-        'apartments.Region', on_delete=models.PROTECT, null=True, blank=True
     )
     city = models.ForeignKey(
         'apartments.City', on_delete=models.PROTECT, null=True, blank=True
@@ -30,6 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         upload_to='users/passport_scans/', null=True, blank=True
     )
     is_owner = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
