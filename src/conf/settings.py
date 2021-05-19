@@ -20,10 +20,9 @@ sys.path.append(os.path.join(settings.BASE_DIR, "apps"))
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG')
+DEBUG = env.bool('DJANGO_DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
-# ALLOWED_HOSTS = ['127.0.0.1']
 
 # Application definition
 
@@ -106,6 +105,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_URL = 'login/'
 
 
 # Internationalization

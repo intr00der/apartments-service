@@ -5,6 +5,7 @@
     <title>Login</title>
 </head>
 <body>
+    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
     <form method="POST">
         {% csrf_token %}
         {{form.as_p}}

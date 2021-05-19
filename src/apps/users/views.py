@@ -1,4 +1,5 @@
 from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse
 
 from .forms import RegisterForm, LoginForm, PasswordChangeForm, EmailChangeForm
@@ -30,6 +31,7 @@ def register_view(request):
     return render(request, 'users/login.html', {'form': form})
 
 
+@login_required
 def email_verification_view(request, uidb64, token):
     token, user = sync_token(uidb64, token)
     if not token:
@@ -40,6 +42,7 @@ def email_verification_view(request, uidb64, token):
     return render(request, 'users/successes/verification_success.html')
 
 
+@login_required
 def login_view(request):
     form = LoginForm(request.POST or None)
     if form.is_valid():
@@ -50,16 +53,19 @@ def login_view(request):
     return render(request, 'users/login.html', {'form': form})
 
 
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('/login')
 
 
+@login_required
 def profile_view(request, pk):
     user = User.objects.get(pk=request.user.pk)
     return render(request, 'users/profile.html', {'user': user})
 
 
+@login_required
 def request_password_change_view(request):
     if request.method == 'GET':
         send_token_email(
@@ -73,6 +79,7 @@ def request_password_change_view(request):
         return render(reverse('home'))
 
 
+@login_required
 def password_change_view(request, uidb64, token):
     token, user = sync_token(uidb64, token)
     if not token:
@@ -86,6 +93,7 @@ def password_change_view(request, uidb64, token):
     return render(request, 'users/change_password.html', {'form': form})
 
 
+@login_required
 def request_email_change_view(request):
     if request.method == 'GET':
         send_token_email(
@@ -99,6 +107,7 @@ def request_email_change_view(request):
         return render(reverse('home'))
 
 
+@login_required
 def email_change_view(request, uidb64, token):
     token, user = sync_token(uidb64, token)
     if not token:
