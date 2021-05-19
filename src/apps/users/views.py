@@ -2,7 +2,12 @@ from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse
 
-from .forms import RegisterForm, LoginForm, PasswordChangeForm, EmailChangeForm
+from .forms import (
+    RegisterForm,
+    LoginForm,
+    PasswordChangeForm,
+    EmailChangeForm
+)
 from .services import (
     create_user_by_form,
     authenticate_user_by_form,
@@ -10,7 +15,6 @@ from .services import (
     set_email_by_form,
     send_token_email,
     sync_token,
-
 )
 
 User = get_user_model()
@@ -42,7 +46,6 @@ def email_verification_view(request, uidb64, token):
     return render(request, 'users/successes/verification_success.html')
 
 
-@login_required
 def login_view(request):
     form = LoginForm(request.POST or None)
     if form.is_valid():
@@ -53,7 +56,6 @@ def login_view(request):
     return render(request, 'users/login.html', {'form': form})
 
 
-@login_required
 def logout_view(request):
     logout(request)
     return redirect('/login')

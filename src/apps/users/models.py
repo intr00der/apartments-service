@@ -1,6 +1,6 @@
-from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from .user_managers import UserManager
