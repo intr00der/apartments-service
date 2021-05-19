@@ -1,12 +1,11 @@
 from django.core.validators import (
     MinValueValidator,
-    MaxValueValidator
+    MaxValueValidator,
 )
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import User
-
 from .fields import ChoiceArrayField
 
 
@@ -29,21 +28,21 @@ class City(models.Model):
 
 class Apartment(models.Model):
     class Amount(models.IntegerChoices):
-        ONE = 1, _('одна')
-        TWO = 2, _('две')
-        THREE = 3, _('три')
-        FOUR = 4, _('четыре')
-        MORE_THAN_FOUR = 5, _('больше, чем четыре')
+        ONE = 1, _('one')
+        TWO = 2, _('two')
+        THREE = 3, _('three')
+        FOUR = 4, _('four')
+        MORE_THAN_FOUR = 5, _('more')
 
     class ConvenienceItems(models.TextChoices):
         WIFI = 'WIFI', _('Wi-Fi')
-        CONDITIONER = 'COND', _('Кондиционер')
-        WASHING_MACHINE = 'WSHM', _('Стиральная машина')
-        DISHWASHER = 'DSHW', _('Посудомоечная машина')
-        HAIRDRYER = 'HRDR', _('Сушилка для волос')
-        MINIBAR = 'MNBR', _('Минибар')
-        LANDLINE_PHONE = 'LLPH', _('Стационарный телефон')
-        CLEAN_LINEN = 'CLLN', _('Чистое белье')
+        CONDITIONER = 'COND', _('Conditioner')
+        WASHING_MACHINE = 'WSHM', _('Washing machine')
+        DISHWASHER = 'DSHW', _('Dishwasher')
+        HAIRDRYER = 'HRDR', _('Hairdryer')
+        MINIBAR = 'MNBR', _('Minibar')
+        LANDLINE_PHONE = 'LLPH', _('Landline phone')
+        CLEAN_LINEN = 'CLLN', _('Clean linen')
 
     owner = models.ForeignKey(
         User, related_name='apartments', on_delete=models.CASCADE
@@ -64,9 +63,6 @@ class Apartment(models.Model):
     )
     is_verified = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f'{self.country}, {self.region}, {self.city}'
-
 
 class ApartmentPhoto(models.Model):
     apartment = models.ForeignKey(
@@ -74,9 +70,6 @@ class ApartmentPhoto(models.Model):
     )
     photo = models.ImageField(upload_to='apartments/images/')
     position = models.IntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.apartment} ({self.pk})'
 
 
 class Reservation(models.Model):
@@ -89,10 +82,6 @@ class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
-
-    def __str__(self):
-        return f'{self.user} - {self.apartment}' \
-               f'({self.datetime_start} - {self.datetime_end})'
 
 
 class Review(models.Model):
@@ -107,5 +96,3 @@ class Review(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
 
-    def __str__(self):
-        return f'{self.user} - ({self.rating})'
