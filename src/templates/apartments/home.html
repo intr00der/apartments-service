@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <p>Logged in as {{request.user.first_name}} {{request.user.last_name}}</p>
+    <a href="{% url 'profile' %}">Profile</a>
+    <h1>Home page!</h1>
+</body>
+</html>
