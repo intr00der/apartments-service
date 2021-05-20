@@ -14,8 +14,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         OTHER = 3, _('Other')
 
     email = models.EmailField(unique=True, max_length=255, blank=False)
-    first_name = models.CharField(validators=[NameValidator, ], max_length=50)
-    last_name = models.CharField(validators=[NameValidator, ], max_length=50)
+    first_name = models.CharField(validators=[NameValidator], max_length=50)
+    last_name = models.CharField(validators=[NameValidator], max_length=50)
     gender = models.IntegerField(choices=GenderChoices.choices)
     born_at = models.DateField(null=True, blank=True)
     country = models.ForeignKey(

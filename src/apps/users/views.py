@@ -1,5 +1,6 @@
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import render, redirect, reverse
 
 from .forms import (
@@ -20,6 +21,7 @@ from .services import (
 User = get_user_model()
 
 
+@transaction.atomic
 def register_view(request):
     form = RegisterForm(request.POST)
     if form.is_valid():
@@ -39,7 +41,7 @@ def register_view(request):
 def email_verification_view(request, uidb64, token):
     token, user = sync_token(uidb64, token)
     if not token:
-        return redirect(reverse('login'))
+        return redirect('login')
 
     user.is_verified = True
     user.save()
@@ -110,7 +112,7 @@ def request_email_change_view(request):
 def email_change_view(request, uidb64, token):
     token, user = sync_token(uidb64, token)
     if not token:
-        return redirect(reverse('login'))
+        return redirect('login')
 
     form = EmailChangeForm(request.POST)
     if form.is_valid():

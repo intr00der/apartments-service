@@ -14,5 +14,5 @@ def match_passwords(password, confirm_password):
 
 def check_email_originality(self, user):
     email = self.cleaned_data.get('email')
-    if user.objects.get(email=email).exists():
+    if user.objects.get(email__iexact=email).exists():
         raise ValidationError("This email is already in use. Use different email address.")

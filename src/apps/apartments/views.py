@@ -3,5 +3,5 @@ from django.shortcuts import render
 
 
 @login_required
-def home_view(request):
+def home(request):
     return render(request, 'apartments/home.html')
