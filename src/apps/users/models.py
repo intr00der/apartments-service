@@ -3,7 +3,8 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from .user_managers import UserManager
+from .managers import UserManager
+from .validators import NameValidator
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -13,8 +14,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         OTHER = 3, _('Other')
 
     email = models.EmailField(unique=True, max_length=255, blank=False)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(validators=[NameValidator, ], max_length=50)
+    last_name = models.CharField(validators=[NameValidator, ], max_length=50)
     gender = models.IntegerField(choices=GenderChoices.choices)
     born_at = models.DateField(null=True, blank=True)
     country = models.ForeignKey(

@@ -21,7 +21,7 @@ User = get_user_model()
 
 
 def register_view(request):
-    form = RegisterForm(request.POST or None)
+    form = RegisterForm(request.POST)
     if form.is_valid():
         user = create_user_by_form(user_model=User, form=form)
         login(request, user)
@@ -29,9 +29,9 @@ def register_view(request):
             request=request,
             user=user,
             view_name='verify-email',
-            invoice_path='users/verify_email_invoice.html'
+            invoice_path='users/invoices/verify_email_invoice.html'
         )
-        return render(request, 'users/send_email_success.html')
+        return render(request, 'users/successes/send_email_success.html')
     return render(request, 'users/login.html', {'form': form})
 
 
@@ -47,24 +47,23 @@ def email_verification_view(request, uidb64, token):
 
 
 def login_view(request):
-    form = LoginForm(request.POST or None)
+    form = LoginForm(request.POST)
     if form.is_valid():
         user = authenticate_user_by_form(form=form, request=request)
         if user:
             login(request, user)
-            return redirect(reverse('home'), kwargs={'pk': user.pk})
+            return redirect('home')
     return render(request, 'users/login.html', {'form': form})
 
 
 def logout_view(request):
     logout(request)
-    return redirect('/login')
+    return redirect('login')
 
 
 @login_required
-def profile_view(request, pk):
-    user = User.objects.get(pk=request.user.pk)
-    return render(request, 'users/profile.html', {'user': user})
+def profile_view(request):
+    return render(request, 'users/profile.html')
 
 
 @login_required
@@ -77,17 +76,16 @@ def request_password_change_view(request):
             invoice_path='users/invoices/password_change_invoice.html'
         )
         return render(request, 'users/successes/request_password_change_success.html')
-    else:
-        return render(reverse('home'))
+    return redirect('home')
 
 
 @login_required
 def password_change_view(request, uidb64, token):
     token, user = sync_token(uidb64, token)
     if not token:
-        return redirect(reverse('login'))
+        return redirect('login')
 
-    form = PasswordChangeForm(request.POST or None)
+    form = PasswordChangeForm(request.POST)
     if form.is_valid():
         set_password_by_form(form, user)
         logout(request)
@@ -105,8 +103,7 @@ def request_email_change_view(request):
             invoice_path='users/invoices/email_change_invoice.html'
         )
         return render(request, 'users/successes/request_email_change_success.html')
-    else:
-        return render(reverse('home'))
+    return redirect('home')
 
 
 @login_required
@@ -115,7 +112,7 @@ def email_change_view(request, uidb64, token):
     if not token:
         return redirect(reverse('login'))
 
-    form = EmailChangeForm(request.POST or None)
+    form = EmailChangeForm(request.POST)
     if form.is_valid():
         set_email_by_form(form, user)
         logout(request)
