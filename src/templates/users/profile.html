@@ -5,8 +5,26 @@
     <title>User Profile</title>
 </head>
 <body>
-    <h3>User profile: {{user.first_name}} {{user.last_name}}</h3>
-    <a href="{% url 'request-password-change' %}"><button>Change password</button></a>
-    <a href="{% url 'request-email-change' %}"><button>Change email</button></a>
+    {% extends 'base.html' %}
+    {% block content %}
+
+        <h3>User profile</h3>
+
+        <p>Email address: {{user.email}}</p>
+        <form method="post">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="submit" value="Save">
+        </form>
+
+        <a href="{% url 'request-password-change' %}"><button>Change password</button></a>
+        <a href="{% url 'request-email-change' %}"><button>Change email</button></a>
+        <a href="{% url 'profile-apartments-list' %}"><input type="button" value="My apartments"></a>
+
+        {% if request.user.is_superuser %}
+            <a href="{% url 'unverified-list' %}">List of unverified apartments</a>
+        {% endif %}
+
+    {% endblock content %}
 </body>
 </html>

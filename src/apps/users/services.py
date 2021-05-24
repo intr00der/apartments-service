@@ -8,9 +8,11 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
+from conf import settings
+
+from datetime import date
 from six import text_type
 
-from conf import settings
 
 User = get_user_model()
 
@@ -22,9 +24,10 @@ def create_user_by_form(user_model, form):
         first_name=form.cleaned_data.get('first_name'),
         last_name=form.cleaned_data.get('last_name'),
         gender=form.cleaned_data.get('gender'),
-        born_at=form.cleaned_data.get('born_at'),
+        born_in=form.cleaned_data.get('born_in'),
         country=form.cleaned_data.get('country'),
-        city=form.cleaned_data.get('city')
+        city=form.cleaned_data.get('city'),
+        passport=form.cleaned_data.get('passport')
     )
     return user
 
@@ -89,3 +92,7 @@ def set_email_by_form(form, user):
     email = form.cleaned_data.get('email')
     user.email = email
     user.save()
+
+
+def get_age(user):
+    return int((date.today() - user.born_in).days/365)

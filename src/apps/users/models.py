@@ -16,8 +16,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, max_length=255, blank=False)
     first_name = models.CharField(validators=[NameValidator], max_length=50)
     last_name = models.CharField(validators=[NameValidator], max_length=50)
-    gender = models.IntegerField(choices=GenderChoices.choices)
-    born_at = models.DateField(null=True, blank=True)
+    gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
+    born_in = models.DateField(null=True, blank=True)
     country = models.ForeignKey(
         'apartments.Country', on_delete=models.PROTECT, null=True, blank=True
     )
@@ -41,4 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = [
         'password', 'first_name',
         'last_name', 'gender',
+        'born_in', 'country',
+        'city'
     ]

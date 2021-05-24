@@ -5,7 +5,6 @@ from django.core.validators import (
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from users.models import User
 from .fields import ChoiceArrayField
 
 
@@ -28,6 +27,7 @@ class City(models.Model):
 
 class Apartment(models.Model):
     class Amount(models.IntegerChoices):
+        NULL = 0, _('not specified')
         ONE = 1, _('one')
         TWO = 2, _('two')
         THREE = 3, _('three')
@@ -45,7 +45,7 @@ class Apartment(models.Model):
         CLEAN_LINEN = 'CLLN', _('Clean linen')
 
     owner = models.ForeignKey(
-        User, related_name='apartments', on_delete=models.CASCADE
+        'users.User', related_name='apartments', on_delete=models.CASCADE
     )
     country = models.ForeignKey(
         Country, related_name='apartments', on_delete=models.PROTECT
@@ -54,14 +54,24 @@ class Apartment(models.Model):
         City, related_name='apartments', on_delete=models.PROTECT
     )
     description = models.TextField()
+    square_area = models.PositiveSmallIntegerField()
     room_amount = models.IntegerField(choices=Amount.choices)
     bedroom_amount = models.IntegerField(choices=Amount.choices)
     daily_rate = models.DecimalField(max_digits=9, decimal_places=2)
     registry_ordering = models.FileField(upload_to='apartments/registry_scans/')
     convenience_items = ChoiceArrayField(
-        models.CharField(max_length=50, choices=ConvenienceItems.choices)
+        models.CharField(default=None, max_length=50, choices=ConvenienceItems.choices, blank=True, null=True)
     )
+    opens_at = models.DateTimeField(null=True, blank=True)
+    closes_at = models.DateTimeField(null=True, blank=True)
+    is_open = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.is_verified:
+            self.owner.is_owner = True
+            self.owner.save()
+        super().save(*args, **kwargs)
 
 
 class ApartmentPhoto(models.Model):
@@ -74,7 +84,7 @@ class ApartmentPhoto(models.Model):
 
 class Reservation(models.Model):
     user = models.ForeignKey(
-        User, related_name='reservations', on_delete=models.PROTECT
+        'users.User', related_name='reservations', on_delete=models.PROTECT
     )
     apartment = models.ForeignKey(
         Apartment, related_name='reservations', on_delete=models.PROTECT
@@ -86,7 +96,7 @@ class Reservation(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(
-        User, related_name='reviews', on_delete=models.CASCADE)
+        'users.User', related_name='reviews', on_delete=models.CASCADE)
     apartment = models.ForeignKey(
         Apartment, related_name='reviews', on_delete=models.CASCADE
     )

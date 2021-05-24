@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unverified apartment list</title>
+</head>
+<body>
+  {% extends 'base.html' %}
+  {% block content %}
+
+  <h2>Unverified apartment list</h2>
+  <a href="{% url 'home' %}"><input type="button" value="Back to home page"></a>
+  <a href="{% url 'profile' %}"><input type="button" value="Back to profile"></a>
+
+  <table>
+
+      <tr>
+          {% for apartment in apartments %}
+              <a href="{% url 'user-detail' user_pk=apartment.owner.pk %}"></a><p>Owner: {{apartment.owner.first_name}} {{apartment.owner.last_name}}</p>
+              <p>Location: {{apartment.city}}, {{apartment.country}}</p>
+              <p><a href="{% url 'apartment-detail' apartment_pk=apartment.pk %}">Details</a></p>
+              <a href="{% url 'verify' apartment_pk=apartment.pk %}"><input type="button" value="Verify apartment"></a>
+          {% endfor %}
+
+          {% endblock content %}
+      </tr>
+  </table>
+</body>
+</html>

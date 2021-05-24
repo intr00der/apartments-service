@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New apartment</title>
+</head>
+<body>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if not request.user.passport %}
+      You must add your passport if want to register your apartment.
+      <input type="file" required name="passport">
+    {% endif %}
+    <p><input type="submit" value="Register apartment"></p>
+  </form>
+</body>
+</html>
