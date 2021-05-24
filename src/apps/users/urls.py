@@ -3,16 +3,17 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .views import (
     auth_login,
-    logout,
-    register,
-    profile,
-    email_verification,
-    request_password_change,
-    password_change,
-    request_email_change,
     email_change,
+    email_verification,
+    logout,
+    password_change,
+    profile,
+    register,
+    request_password_change,
+    request_email_change,
     user_detail,
 )
+
 urlpatterns = [
     path('register/', register, name='register'),
     path('login/', auth_login, name='login'),
