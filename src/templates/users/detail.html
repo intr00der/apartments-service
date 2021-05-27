@@ -1,23 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User details</title>
-</head>
-<body>
-  <h2>{{user.first_name}} {{user.last_name}}</h2>
-  <p>{{user.gender}}, {{user.age}}yr</p>
-  <p>Email: {{user.email}}</p>
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{user.first_name}} {{user.last_name}}</h2>
+<p>{{user.gender}}, {{user.age}}yr</p>
+<p>Email: {{user.email}}</p>
 
-  {% if user.is_owner %}
-    <h2>User's apartments</h2>
-    <table>
-      {% for apartment in apartments %}
-        <tr>Location: {{apartment.city}}, {{apartment.country}}</tr>
-        <tr>{{apartments.room_amount}} rooms, {{apartments.room_amount}} bedrooms</tr>
-      {% endfor %}
-    </table>
-  {% endif %}
-
-</body>
-</html>
+{% if user.is_owner %}
+  <h2>User's apartments</h2>
+  <table>
+    {% for apartment in apartments %}
+      <tr>Location: {{apartment.city}}, {{apartment.country}}</tr>
+      <tr>{{apartments.room_amount}} rooms, {{apartments.room_amount}} bedrooms</tr>
+    {% endfor %}
+  </table>
+{% endif %}
+{% endblock %}

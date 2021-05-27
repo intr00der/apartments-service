@@ -1,36 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Home</title>
-</head>
-<body>
-    {% extends 'base.html' %}
-    {% block content %}
 
-        <p>Logged in as {{request.user.first_name}} {{request.user.last_name}}</p>
+{% extends 'base.html' %}
+{% block content %}
+<h1>Home page!</h1>
 
-        <a href="{% url 'profile' %}">Profile</a>
-        <h1>Home page!</h1>
+<form method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Search">
+</form>
 
-
-
-        <form method="post">
-            {% csrf_token %}
-            {{form.as_p}}
-            <input type="submit" value="Search">
-        </form>
-
-        <h3>Available apartments</h3>
-        {% if apartments %}
-            {% for apartment in apartments %}
-                <p>{{apartment.city}}, {{apartment.country}}</p>
-                <p>{{apartment.daily_rate}}</p>
-                <p><a href="{% url 'apartment-detail' apartment.pk %}">Details</a></p>
-            {% endfor %}
-        {% else %}
-            <p>None are found or available with requested features.</p>
-        {% endif %}
-    {% endblock content %}
-</body>
-</html>
+<h3>Available apartments</h3>
+{% if apartments %}
+    {% for apartment in apartments %}
+        <p>{{apartment.city}}, {{apartment.country}}</p>
+        <p>{{apartment.daily_rate}}</p>
+        <p><a href="{% url 'apartment-detail' apartment.pk %}">Details</a></p>
+    {% endfor %}
+{% else %}
+    <p>None are found or available with requested features.</p>
+{% endif %}
+{% endblock content %}

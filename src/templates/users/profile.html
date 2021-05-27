@@ -1,30 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User Profile</title>
-</head>
-<body>
-    {% extends 'base.html' %}
-    {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 
-        <h3>User profile</h3>
+<h3>User profile</h3>
+<p>Email address: {{user.email}}</p>
+<form method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Save">
+</form>
 
-        <p>Email address: {{user.email}}</p>
-        <form method="post">
-            {% csrf_token %}
-            {{form.as_p}}
-            <input type="submit" value="Save">
-        </form>
-
-        <a href="{% url 'request-password-change' %}"><button>Change password</button></a>
-        <a href="{% url 'request-email-change' %}"><button>Change email</button></a>
-        <a href="{% url 'profile-apartments-list' %}"><input type="button" value="My apartments"></a>
-
-        {% if request.user.is_superuser %}
-            <a href="{% url 'unverified-list' %}">List of unverified apartments</a>
-        {% endif %}
-
-    {% endblock content %}
-</body>
-</html>
+<a href="{% url 'request-password-change' %}"><button>Change password</button></a>
+<a href="{% url 'request-email-change' %}"><button>Change email</button></a>
+{% endblock content %}

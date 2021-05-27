@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3>List of your bookings</h3>
+{% for booking in bookings %}
+    <p>Location: {{booking.apartment.city}}, {{booking.apartment.country}}</p>
+    <p>Period: {{booking.starts_at}} {{booking.ends_at}}</p>
+    <p>Daily rate: {{booking.apartment.daily_rate}}</p>
+{% endfor %}
+
+{% endblock %}

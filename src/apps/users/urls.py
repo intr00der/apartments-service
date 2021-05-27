@@ -5,7 +5,7 @@ from .views import (
     auth_login,
     email_change,
     email_verification,
-    logout,
+    auth_logout,
     password_change,
     profile,
     register,
@@ -17,7 +17,7 @@ from .views import (
 urlpatterns = [
     path('register/', register, name='register'),
     path('login/', auth_login, name='login'),
-    path('logout/', logout, name='logout'),
+    path('logout/', auth_logout, name='logout'),
     path('profile/', profile, name='profile'),
     path('verify-email/<uidb64>/<token>', csrf_exempt(email_verification), name='verify-email'),
     path('request-password-change/', request_password_change, name='request-password-change'),
