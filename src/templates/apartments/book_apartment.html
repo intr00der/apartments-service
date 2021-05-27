@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Book apartment:</h3>
+<p>Location: {{ apartment.city }}, {{ apartment.country }}</p>
+<p>Square area: {{apartment.square_area}}, rooms: {{apartment.room_amount}}, bedrooms: {{apartment.bedroom_amount}}</p>
+<p>Available between: {{apartment.opens_at}} - {{apartment.closes_at}}</p>
+<p>{{request.booked_days}}</p>
+<form method="post">
+  {% csrf_token %}
+  {{form.as_p}}
+  <input type="submit" value="Book">
+</form>
+<script type="text/javascript">
+  const opens_at = "{{apartment.opens_at}}";
+  const closes_at = "{{apartment.closes_at}}";
+  const booked_days = "{{apartment.booked_days}}"
+</script>
+{% endblock %}

@@ -1,11 +1,9 @@
-from django.core.validators import (
-    MinValueValidator,
-    MaxValueValidator,
-)
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from .fields import ChoiceArrayField
+
+from statistics import mean
 
 
 class Country(models.Model):
@@ -62,8 +60,9 @@ class Apartment(models.Model):
     convenience_items = ChoiceArrayField(
         models.CharField(default=None, max_length=50, choices=ConvenienceItems.choices, blank=True, null=True)
     )
-    opens_at = models.DateTimeField(null=True, blank=True)
-    closes_at = models.DateTimeField(null=True, blank=True)
+    average_rating = models.FloatField(null=True, blank=True)
+    opens_at = models.DateField(null=True, blank=True)
+    closes_at = models.DateField(null=True, blank=True)
     is_open = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
 
@@ -82,19 +81,27 @@ class ApartmentPhoto(models.Model):
     position = models.IntegerField(null=True, blank=True)
 
 
-class Reservation(models.Model):
+class Booking(models.Model):
     user = models.ForeignKey(
-        'users.User', related_name='reservations', on_delete=models.PROTECT
+        'users.User', related_name='bookings', on_delete=models.PROTECT
     )
     apartment = models.ForeignKey(
-        Apartment, related_name='reservations', on_delete=models.PROTECT
+        Apartment, related_name='bookings', on_delete=models.PROTECT
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    starts_at = models.DateTimeField()
-    ends_at = models.DateTimeField()
+    created_at = models.DateField(auto_now_add=True)
+    starts_at = models.DateField()
+    ends_at = models.DateField()
 
 
 class Review(models.Model):
+    class Rating(models.IntegerChoices):
+        ZERO = 0, _('0')
+        ONE = 1, _('1')
+        TWO = 2, _('2')
+        THREE = 3, _('3')
+        FOUR = 4, _('4')
+        FIVE = 5, _('5')
+
     user = models.ForeignKey(
         'users.User', related_name='reviews', on_delete=models.CASCADE)
     apartment = models.ForeignKey(
@@ -102,6 +109,16 @@ class Review(models.Model):
     )
     heading = models.CharField(max_length=200)
     text = models.TextField()
-    rating = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(5)]
-    )
+    rating = models.IntegerField(choices=Rating.choices)
+
+    def calculate_average_rating(self):
+        apartment_ratings = Review.objects.filter(apartment=self.apartment).values('rating')
+        ratings_lst = [i['rating'] for i in apartment_ratings]
+        ratings_lst.append(self.rating)
+        avg = round(mean(ratings_lst), 2)
+        self.apartment.average_rating = avg
+        self.apartment.save()
+
+    def save(self, *args, **kwargs):
+        self.calculate_average_rating()
+        super().save(*args, **kwargs)

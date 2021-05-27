@@ -6,13 +6,19 @@ from .views import (
     apartment_detail,
     verify,
     profile_apartment_list,
+    book_apartment,
+    post_review,
+    bookings_list,
 )
 
 urlpatterns = [
     path('', home, name='home'),
-    path('register-apartment/', register_apartment, name='register-apartment'),
-    path('unverified-list/', unverified_apartment_list, name='unverified-list'),
+    path('profile/apartments/', profile_apartment_list, name='profile-apartments-list'),
+    path('profile/bookings/', bookings_list, name='bookings-list'),
+    path('apartments/register', register_apartment, name='register-apartment'),
+    path('apartments/unverified', unverified_apartment_list, name='unverified-apartments-list'),
     path('apartments/<apartment_pk>/', apartment_detail, name='apartment-detail'),
-    path('verify/<apartment_pk>', verify, name='verify'),
-    path('my-apartments/', profile_apartment_list, name='profile-apartments-list'),
+    path('apartments/<apartment_pk>/book', book_apartment, name='book-apartment'),
+    path('apartments/<apartment_pk>/review', post_review, name='review'),
+    path('apartments/<apartment_pk>/verify', verify, name='verify'),
 ]

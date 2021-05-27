@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from .forms import (
@@ -64,7 +65,7 @@ def auth_login(request):
     return render(request, 'users/login.html', {'form': form})
 
 
-def logout(request):
+def auth_logout(request):
     logout(request)
     return redirect('login')
 
@@ -142,11 +143,19 @@ def email_change(request, uidb64, token):
 def user_detail(request, user_pk):
     if request.method == 'GET':
         try:
-            user = User.objects.get(pk=user_pk)
-            user.age = get_age(user)
-            if user.is_owner:
-                apartments = Apartment.objects.filter(owner_id=user_pk)
-            return render(request, 'users/detail.html', {'user': user, 'apartments': apartments})
+            if request.user.pk != int(user_pk):
+                user = User.objects.get(pk=user_pk)
+                user.age = get_age(user)
+                context = {
+                    'user': user,
+                }
+                if user.is_owner:
+                    apartments = Apartment.objects.filter(owner_id=user_pk)
+                    context['apartments'] = apartments
+                return render(request, 'users/detail.html', context)
+            return redirect('profile')
         except User.DoesNotExist:
             messages.error(request, "Such user doesn't exist.")
             return redirect('home')
+    return HttpResponse(status=500)
+

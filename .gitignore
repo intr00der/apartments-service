@@ -1,5 +1,5 @@
-src/media/apartments/registry_scans
-src/media/users/passport_scans
+src/media
+src/media
 mm.sh
 .scratch
 .idea

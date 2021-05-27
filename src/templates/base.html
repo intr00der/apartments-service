@@ -1,16 +1,35 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 <body>
-  {% if messages %}
-    {% for message in messages %}
-        <p>{{ message }}</p>
-    {% endfor %}
-  {% endif %}
+    {% if request.user.is_authenticated %}
+        <p>Logged in as {{request.user.first_name}} {{request.user.last_name}}</p>
+        <a href="{% url 'home' %}"><input type="button" value="Home"></a>
+        <a href="{% url 'profile' %}"><input type="button" value="Profile"></a>
+        <a href="{% url 'profile-apartments-list' %}"><input type="button" value="My apartments"></a>
+        <a href="{% url 'bookings-list' %}"><input type="button" value="My bookings"></a>
+    {% endif %}
 
-  {% block content %}
-  {% endblock %}
+    {% if request.user.is_superuser %}
+        <a href="{% url 'unverified-apartments-list' %}"><input type="button" value="Unverified apartments"></a>
+    {% endif %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="{% static 'js/genericDatepicker.jquery.js' %}"></script>
+    <script src="{% static 'js/bookingDatepicker.jquery.js' %}"></script>
 </body>
 </html>
