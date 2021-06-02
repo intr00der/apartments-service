@@ -2,18 +2,17 @@ from django.contrib.auth.base_user import BaseUserManager
 
 from datetime import date
 
-from apartments.models import Country, City
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password, first_name, last_name,
-                    gender, born_in, country, city, passport):
+                    gender, birthday, country, city, passport):
         user = self.model(
             email=self.normalize_email(email),
             password=password,
             first_name=first_name,
             last_name=last_name,
             gender=gender,
-            born_in=born_in,
+            birthday=birthday,
             country=country,
             city=city,
             passport=passport,
@@ -23,15 +22,15 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, first_name, last_name,
-                         gender, born_in, country, city, ):
+                         gender, birthday, country, city, ):
         user = self.model(
             email=self.normalize_email(email),
             first_name=first_name,
             last_name=last_name,
             gender=gender,
-            born_in=born_in,
-            country=Country.objects.get(pk=country),
-            city=City.objects.get(pk=city),
+            birthday=birthday,
+            country_id=city,
+            city_id=country,
             is_staff=True,
             is_superuser=True
         )

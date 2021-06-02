@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -66,12 +67,6 @@ class Apartment(models.Model):
     is_open = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
-        if self.is_verified:
-            self.owner.is_owner = True
-            self.owner.save()
-        super().save(*args, **kwargs)
-
 
 class ApartmentPhoto(models.Model):
     apartment = models.ForeignKey(
@@ -94,14 +89,6 @@ class Booking(models.Model):
 
 
 class Review(models.Model):
-    class Rating(models.IntegerChoices):
-        ZERO = 0, _('0')
-        ONE = 1, _('1')
-        TWO = 2, _('2')
-        THREE = 3, _('3')
-        FOUR = 4, _('4')
-        FIVE = 5, _('5')
-
     user = models.ForeignKey(
         'users.User', related_name='reviews', on_delete=models.CASCADE)
     apartment = models.ForeignKey(
@@ -109,16 +96,16 @@ class Review(models.Model):
     )
     heading = models.CharField(max_length=200)
     text = models.TextField()
-    rating = models.IntegerField(choices=Rating.choices)
-
-    def calculate_average_rating(self):
-        apartment_ratings = Review.objects.filter(apartment=self.apartment).values('rating')
-        ratings_lst = [i['rating'] for i in apartment_ratings]
-        ratings_lst.append(self.rating)
-        avg = round(mean(ratings_lst), 2)
-        self.apartment.average_rating = avg
-        self.apartment.save()
+    rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    #
+    # def calculate_average_rating(self):
+    #     apartment_ratings = Review.objects.filter(apartment=self.apartment).values('rating')
+    #     ratings_lst = [i['rating'] for i in apartment_ratings]
+    #     ratings_lst.append(self.rating)
+    #     avg = round(mean(ratings_lst), 2)
+    #     self.apartment.average_rating = avg
+    #     self.apartment.save()
 
     def save(self, *args, **kwargs):
-        self.calculate_average_rating()
+        # self.calculate_average_rating()
         super().save(*args, **kwargs)

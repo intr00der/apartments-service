@@ -8,8 +8,10 @@
   <h2>User's apartments</h2>
   <table>
     {% for apartment in apartments %}
-      <tr>Location: {{apartment.city}}, {{apartment.country}}</tr>
-      <tr>{{apartments.room_amount}} rooms, {{apartments.room_amount}} bedrooms</tr>
+    <tr>
+      <td>Location: {{apartment.city}}, {{apartment.country}},</td>
+      <td>{{apartment.room_amount}} rooms, {{apartment.bedroom_amount}} bedrooms </td>
+    </tr>
     {% endfor %}
   </table>
 {% endif %}

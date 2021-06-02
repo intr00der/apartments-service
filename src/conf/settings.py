@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 
     'apartments',
     'users',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'conf.wsgi.application'
+
+# ASGI_APPLICATION = 'conf.asgi.application'
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -129,6 +140,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static'),
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

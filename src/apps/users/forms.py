@@ -16,22 +16,20 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = (
             'email', 'first_name', 'last_name', 'gender',
-            'born_in', 'country', 'city', 'passport'
+            'birthday', 'country', 'city', 'passport'
         )
+        widgets = {'birthday': forms.TextInput(attrs={'class': 'genericDatepicker hasDatepicker'})}
 
     def validate_password_with_matching(self, *args, **kwargs):
-        try:
-            password = self.cleaned_data.get('password')
-            confirm_password = self.cleaned_data.get('confirm_password')
-            if password:
-                validate_password(password=password)
-                match_passwords(password, confirm_password)
-        except ValidationError as err:
-            self.add_error(field='password', error=err)
+        password = self.cleaned_data['password']
+        confirm_password = self.cleaned_data['confirm_password']
+        if password:
+            validate_password(password=password)
+            match_passwords(password, confirm_password)
 
-    def clean(self, *args, **kwargs):
+    def clean(self):
         self.validate_password_with_matching()
-        return super().clean(*args, **kwargs)
+        return super().clean()
 
 
 class ProfileForm(forms.ModelForm):
@@ -39,7 +37,7 @@ class ProfileForm(forms.ModelForm):
         model = User
         fields = (
             'first_name', 'last_name', 'gender',
-            'born_in', 'country', 'city', 'passport'
+            'birthday', 'country', 'city', 'passport'
         )
 
 
@@ -53,23 +51,20 @@ class PasswordChangeForm(forms.Form):
     confirm_password = forms.CharField(widget=forms.PasswordInput())
 
     def validate_password_with_matching(self, *args, **kwargs):
-        try:
-            password = self.cleaned_data.get('password')
-            confirm_password = self.cleaned_data.get('confirm_password')
-            if password:
-                validate_password(password=password)
-                match_passwords(password, confirm_password)
-        except ValidationError as err:
-            self.add_error(field='password', error=err)
+        password = self.cleaned_data['password']
+        confirm_password = self.cleaned_data['confirm_password']
+        if password:
+            validate_password(password=password)
+            match_passwords(password, confirm_password)
 
     def clean(self, *args, **kwargs):
         self.validate_password_with_matching()
-        return super().clean(*args, **kwargs)
+        return super().clean()
 
 
 class EmailChangeForm(forms.Form):
     email = forms.EmailField()
 
-    def clean(self, *args, **kwargs):
+    def clean(self):
         check_email_originality(self, User)
-        return super().clean(*args, **kwargs)
+        return super().clean()

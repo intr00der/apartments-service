@@ -1,20 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
+<h3>Apartment:</h3>
+<p>Location: {{apartment.city}}, {{apartment.country}}</p>
+  <p>Square area: {{apartment.square_area}}, daily rate: {{apartment.daily_rate}}</p>
+  <ul>
+    <p>Convenience items:</p>
+    {% for item in apartment.convenience_items %}
+    <li>{{item}}</li>
+    {% endfor %}
+  </ul>
 
-<h3>List of your bookings</h3>
+<h3>List of apartment's bookings</h3>
 {% if bookings_page %}
     {% for booking in bookings_page %}
+    <div>
         <p>Location: {{booking.apartment.city}}, {{booking.apartment.country}}</p>
         <p>(Booking: {{booking.id}}, Apartment: {{booking.apartment.id}})</p>
+        <p>Client: {{booking.user.first_name}} {{booking.user.last_name}} ({{booking.user.email}})</p>
         <p>Period: {{booking.starts_at}} {{booking.ends_at}}</p>
-        <p>Daily rate: {{booking.apartment.daily_rate}}</p>
         {% if booking.unread_messages != 0 %}
             <p style="font-weight:bolder">Unread messages: {{booking.unread_messages}}</p>
         {% endif %}
-        <p><a href="{% url 'booking-chat' booking.pk %}">Chat with owner</a></p>
-        {% if booking.unread_messages %}
-        YEAH
-        {% endif %}
+        <p><a href="{% url 'booking-chat' booking.pk %}">Chat with client</a></p>
+    </div>
     {% endfor %}
 {% else %}
     <p>You don't have any bookings yet.</p>

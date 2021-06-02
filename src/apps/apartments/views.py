@@ -1,7 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect
+
+import json
 
 from .forms import (
     ApartmentForm,
@@ -13,25 +16,28 @@ from .models import Apartment, Booking
 from .services import (
     verify_apartment,
     get_booked_days,
-    get_formatted_date_list,
     can_review,
+    get_bookings_page,
+    get_apartments_page,
 )
+from users.services import verified_only
 
 
 @login_required
 def home(request):
-    form = ApartmentFilteringForm(request.POST)
-    apartments = form.filter_apartments_by_query(request)
-    return render(request, 'apartments/home.html', {'apartments': apartments, 'form': form})
+    form = ApartmentFilteringForm(request.GET)
+    apartments_page = get_apartments_page(form, request)
+    return render(request, 'apartments/home.html', {'apartments_page': apartments_page, 'form': form})
 
 
 @login_required
+@verified_only
 def register_apartment(request):
-    user = request.user
     if request.method == 'POST':
+        user = request.user
         form = ApartmentForm(request.POST, request.FILES, user=user)
         if form.is_valid():
-            form.create_apartment_by_form()
+            form.save_apartment_with_added_data()
             messages.success(request, "Apartment registered successfully! Now it's on the inspection.")
             return redirect('home')
     else:
@@ -40,103 +46,130 @@ def register_apartment(request):
 
 
 @login_required
+@verified_only
 def unverified_apartment_list(request):
-    if request.method == 'GET':
-        if request.user.is_superuser:
-            apartments = Apartment.objects.filter(is_verified=False)
-            return render(request, 'apartments/unverified_list.html', {'apartments': apartments})
-        else:
-            messages.error(request, "You're not allowed to visit that page.")
-            redirect('home')
-    return HttpResponse(status=500)
+    if request.user.is_superuser:
+        apartments = Apartment.objects.filter(is_verified=False)
+        return render(request, 'apartments/unverified_list.html', {'apartments': apartments})
+    else:
+        messages.error(request, "You're not allowed to visit that page.")
+        return redirect('home')
 
 
 @login_required
+@verified_only
 def apartment_detail(request, apartment_pk):
     try:
         apartment = Apartment.objects.get(pk=apartment_pk)
-        if apartment.owner.pk == request.user.pk:
-            if request.method == 'POST':
-                form = ApartmentForm(request.POST, request.FILES, instance=apartment)
-                if form.is_valid():
-                    form.save()
-                    messages.success(request, 'Changes made successfully!')
-                    redirect('apartment-detail', {'form': form})
-            else:
-                form = ApartmentForm(instance=apartment)
-            return render(request, 'apartments/apartment-form-profile.html', {'form': form})
+    except Apartment.DoesNotExist:
+        messages.error(request, 'Such apartment does not exist.')
+        return redirect('home')
+
+    if apartment.owner.pk == request.user.pk:
+        if request.method == 'POST':
+            form = ApartmentForm(request.POST, request.FILES, instance=apartment)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Changes made successfully!')
+                return render(request, 'apartment-detail', {'form': form})
         else:
-            return render(request, 'apartments/apartment_detail.html', {'apartment': apartment})
-    except Apartment.DoesNotExist:
-        messages.error(request, 'Such apartment does not exist.')
-        return redirect('home')
+            form = ApartmentForm(instance=apartment)
+        return render(request, 'apartments/apartment-form-profile.html', {'form': form})
+    return render(request, 'apartments/apartment_detail.html', {'apartment': apartment})
 
 
 @login_required
+@verified_only
 def verify(request, apartment_pk):
-    try:
-        if request.method == 'GET':
-            if request.user.is_superuser:
-                verify_apartment(apartment_pk)
-                messages.success(request, 'Apartment was verified successfully!')
-                return redirect('unverified-list')
-        return HttpResponse(status=500)
-    except Apartment.DoesNotExist:
-        messages.error(request, 'Such apartment does not exist.')
-        return redirect('home')
+    if request.user.is_superuser:
+        try:
+            verify_apartment(apartment_pk)
+            messages.success(request, 'Apartment was verified successfully!')
+        except Apartment.DoesNotExist:
+            messages.error(request, 'Such apartment does not exist.')
+    return redirect('unverified-list')
 
 
 @login_required
+@verified_only
 def profile_apartment_list(request):
-    if request.method == 'GET':
-        apartments = Apartment.objects.filter(owner_id=request.user.pk)
-        return render(request, 'apartments/users_apartment_list.html', {'apartments': apartments})
-    return HttpResponse(status=500)
+    apartments = Apartment.objects.filter(owner_id=request.user.pk)
+    return render(request, 'apartments/users_apartment_list.html', {'apartments': apartments})
 
 
 @login_required
+@verified_only
 def book_apartment(request, apartment_pk):
     try:
         apartment = Apartment.objects.get(pk=apartment_pk)
-        user = request.user
-        apartment.booked_days = get_formatted_date_list(get_booked_days(apartment))
-        if request.method == 'POST':
-            form = BookingForm(request.POST, user=user, apartment=apartment)
-            if form.is_valid():
-                form.create_booking_by_form()
-                messages.success(request, 'Successfully booked!')
-                return redirect('home')
-        else:
-            form = BookingForm()
-        return render(request, 'apartments/book_apartment.html', {'apartment': apartment, 'form': form})
     except Apartment.DoesNotExist:
         messages.error(request, 'Such apartment does not exist.')
         return redirect('home')
 
+    booked_days = get_booked_days(apartment)
+    booked_days_json = json.dumps(booked_days, cls=DjangoJSONEncoder)
+    if request.method == 'POST':
+        form = BookingForm(request.POST, user=request.user, apartment=apartment)
+        if form.is_valid():
+            form.save_booking_with_added_data()
+            messages.success(request, 'Successfully booked!')
+            return redirect('home')
+    else:
+        form = BookingForm()
+    return render(request, 'apartments/book_apartment.html',
+                  {'apartment': apartment, 'form': form, 'booked_days': booked_days_json})
 
+
+@login_required
+@verified_only
 def bookings_list(request):
-    user = request.user
-    bookings = Booking.objects.filter(user=user)
-    return render(request, 'apartments/booking_list.html', {'bookings': bookings})
+    bookings = Booking.objects.filter(
+        user=request.user).annotate(
+        unread_messages=Count('booking_messages',
+                              filter=Q(booking_messages__receiver=request.user, booking_messages__read=False))) \
+        .order_by('unread_messages')
+    bookings_page = get_bookings_page(request, bookings)
+    return render(request, 'apartments/booking_list.html', {'bookings_page': bookings_page})
 
 
+@login_required
+@verified_only
 def post_review(request, apartment_pk):
     try:
-        user = request.user
         apartment = Apartment.objects.get(pk=apartment_pk)
-        user_can_review, error_msg = can_review(user, apartment)
-        if user_can_review:
-            if request.method == 'POST':
-                form = ReviewForm(request.POST, user=user, apartment=apartment)
-                if form.is_valid():
-                    form.create_review_by_form()
-                    messages.success(request, 'Review created successfully!')
-                    return redirect('apartment-detail', apartment_pk)
-            else:
-                form = ReviewForm()
-            return render(request, 'apartments/review.html', {'apartment': apartment, 'form': form})
-        messages.warning(request, error_msg)
-        return redirect('home')
     except Apartment.DoesNotExist:
         messages.error(request, 'Such apartment does not exist.')
         return redirect('home')
+
+    user = request.user
+    user_can_review, error_msg = can_review(user, apartment)
+    if user_can_review:
+        if request.method == 'POST':
+            form = ReviewForm(request.POST, user=user, apartment=apartment)
+            if form.is_valid():
+                form.save_review_with_added_data()
+                messages.success(request, 'Review created successfully!')
+                return redirect('apartment-detail', apartment_pk)
+        else:
+            form = ReviewForm()
+        return render(request, 'apartments/review.html', {'apartment': apartment, 'form': form})
+    messages.warning(request, error_msg)
+    return redirect('home')
+
+
+@login_required
+@verified_only
+def apartment_bound_bookings(request, apartment_pk):
+    apartment = Apartment.objects.get(pk=apartment_pk)
+    if request.user != apartment.owner:
+        messages.error(request, "You're not allowed to see the bookings on an apartment which doesn't belong to you.")
+        return redirect('home')
+
+    bookings = Booking.objects.filter(
+        apartment_id=apartment_pk).annotate(
+        unread_messages=Count('booking_messages',
+                              filter=Q(booking_messages__receiver=request.user, booking_messages__read=False))) \
+        .order_by('unread_messages')
+    bookings_page = get_bookings_page(request, bookings)
+    context = {'apartment': apartment, 'bookings_page': bookings_page}
+    return render(request, 'apartments/apartment_bound_bookings.html', context)

@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from .forms import (
@@ -20,6 +19,7 @@ from .services import (
     send_token_email,
     sync_token,
     get_age,
+    verified_only,
 )
 
 from apartments.models import Apartment
@@ -29,18 +29,21 @@ User = get_user_model()
 
 @transaction.atomic
 def register(request):
-    form = RegisterForm(request.POST, request.FILES)
-    if form.is_valid():
-        user = create_user_by_form(user_model=User, form=form)
-        login(request, user)
-        send_token_email(
-            request=request,
-            user=user,
-            view_name='verify-email',
-            invoice_path='users/invoices/verify_email_invoice.html'
-        )
-        return render(request, 'users/successes/send_email_success.html')
-    return render(request, 'users/login.html', {'form': form})
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = create_user_by_form(user_model=User, form=form)
+            login(request, user)
+            send_token_email(
+                request=request,
+                user=user,
+                view_name='verify-email',
+                invoice_path='users/invoices/verify_email_invoice.html'
+            )
+            return render(request, 'users/successes/send_email_success.html')
+    else:
+        form = RegisterForm()
+    return render(request, 'users/register.html', {'form': form})
 
 
 @login_required
@@ -52,7 +55,7 @@ def email_verification(request, uidb64, token):
     user.is_verified = True
     user.save()
     messages.success(request, "You've successfully verified your email address.")
-    redirect('home')
+    return redirect('home')
 
 
 def auth_login(request):
@@ -77,7 +80,6 @@ def profile(request):
         form = ProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            redirect('profile')
     else:
         form = ProfileForm(instance=user)
     return render(request, 'users/profile.html', {'form': form})
@@ -140,22 +142,15 @@ def email_change(request, uidb64, token):
 
 
 @login_required
+@verified_only
 def user_detail(request, user_pk):
-    if request.method == 'GET':
+    if request.user.pk != int(user_pk):
         try:
-            if request.user.pk != int(user_pk):
-                user = User.objects.get(pk=user_pk)
-                user.age = get_age(user)
-                context = {
-                    'user': user,
-                }
-                if user.is_owner:
-                    apartments = Apartment.objects.filter(owner_id=user_pk)
-                    context['apartments'] = apartments
-                return render(request, 'users/detail.html', context)
-            return redirect('profile')
+            user = User.objects.get(pk=user_pk)
         except User.DoesNotExist:
             messages.error(request, "Such user doesn't exist.")
-            return redirect('home')
-    return HttpResponse(status=500)
 
+        user.age = get_age(user)
+        apartments = Apartment.objects.filter(owner_id=user_pk)
+        return render(request, 'users/detail.html', {'user': user, 'apartments': apartments})
+    return redirect('profile')

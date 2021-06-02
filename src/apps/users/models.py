@@ -17,7 +17,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(validators=[NameValidator], max_length=50)
     last_name = models.CharField(validators=[NameValidator], max_length=50)
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
-    born_in = models.DateField(null=True, blank=True)
+    birthday = models.DateField(null=True, blank=True)
     country = models.ForeignKey(
         'apartments.Country', on_delete=models.PROTECT, null=True, blank=True
     )
@@ -27,7 +27,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     passport = models.FileField(
         upload_to='users/passport_scans/', null=True, blank=True
     )
-    is_owner = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -41,6 +40,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = [
         'password', 'first_name',
         'last_name', 'gender',
-        'born_in', 'country',
+        'birthday', 'country',
         'city'
     ]

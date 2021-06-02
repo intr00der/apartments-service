@@ -22,6 +22,7 @@
     {% endfor %}
   </ul>
   <p><a href="{% url 'review' apartment.pk %}">Leave a review</a></p>
+  <p><a href="{% url 'book-apartment' apartment.pk %}">Book</a></p>
 
 {% endblock content %}
 </body>

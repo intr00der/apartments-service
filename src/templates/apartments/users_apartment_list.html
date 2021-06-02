@@ -2,6 +2,7 @@
 {% block content %}
 
 <h2>Your apartments</h2>
+{% if apartments %}
   <table>
     {% for apartment in apartments %}
       <tr>
@@ -12,8 +13,12 @@
       </tr>
       <tr>
         <td><a href="{% url 'apartment-detail' apartment.pk %}">Details</a></td>
+        <td><a href="{% url 'apartment-bound-bookings' apartment.pk %}">Apartment's bookings</a></td>
       </tr>
     {% endfor %}
   </table>
+{% else %}
+  <p>You don't have any apartments yet. <a href="{% url 'register-apartment' %}">Register an apartment</a></p>
+{% endif %}
 
 {% endblock %}
