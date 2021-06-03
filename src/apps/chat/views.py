@@ -24,7 +24,7 @@ def booking_chat(request, booking_id):
     if request.method == 'POST':
         form = BookingMessageForm(request.POST, sender=request.user, booking=booking)
         if form.is_valid():
-            form.save_message_with_added_data()
+            form.save()
             return redirect('booking-chat', booking_id)
     else:
         form = BookingMessageForm()

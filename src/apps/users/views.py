@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect
@@ -11,6 +11,7 @@ from .forms import (
     PasswordChangeForm,
     EmailChangeForm,
 )
+from .models import User
 from .services import (
     create_user_by_form,
     authenticate_user_by_form,
@@ -21,10 +22,7 @@ from .services import (
     get_age,
     verified_only,
 )
-
 from apartments.models import Apartment
-
-User = get_user_model()
 
 
 @transaction.atomic

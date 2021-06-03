@@ -21,11 +21,11 @@ class BookingMessageForm(forms.ModelForm):
         set_receiver(self)
         return super().clean()
 
-    def save_message_with_added_data(self):
-        form_instance = self.save(commit=False)
-        form_instance.sender = self.sender
-        form_instance.receiver = self.receiver
-        form_instance.booking = self.booking
-        form_instance.is_seen_by_client = self.is_seen_by_client
-        form_instance.is_seen_by_owner = self.is_seen_by_owner
-        form_instance.save()
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.sender = self.sender
+        instance.receiver = self.receiver
+        instance.booking = self.booking
+        instance.is_seen_by_client = self.is_seen_by_client
+        instance.is_seen_by_owner = self.is_seen_by_owner
+        instance.save()

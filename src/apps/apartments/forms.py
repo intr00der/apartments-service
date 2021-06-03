@@ -1,17 +1,16 @@
 from django import forms
 from django.db import models
-from django.contrib.postgres.search import SearchVector
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from .models import Apartment, Booking, Review, Country, City
+from .models import Apartment, Booking, Review
 
 from .services import parse_date_string
 
 
 class ApartmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', [])
+        self.owner = kwargs.pop('owner', [])
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -28,10 +27,10 @@ class ApartmentForm(forms.ModelForm):
             'closes_at': forms.TextInput(attrs={'class': 'genericDatepicker'}),
         }
 
-    def save_apartment_with_added_data(self):
-        form_instance = self.save(commit=False)
-        form_instance.owner = self.user
-        form_instance.save()
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.owner = self.owner
+        instance.save()
 
     def compare_room_and_bedroom_amounts(self):
         room_amount = self.cleaned_data['room_amount']
@@ -106,12 +105,6 @@ class BookingForm(forms.ModelForm):
             'ends_at': forms.TextInput(attrs={'class': 'bookingDatepicker'}),
         }
 
-    def save_booking_with_added_data(self):
-        form_instance = self.save(commit=False)
-        form_instance.user = self.user
-        form_instance.apartment = self.apartment
-        form_instance.save()
-
     def validate_booking_dates(self):
         apartment_opens_at = self.apartment.opens_at
         apartment_closes_at = self.apartment.closes_at
@@ -125,11 +118,10 @@ class BookingForm(forms.ModelForm):
         if requested_end_date > apartment_closes_at:
             raise forms.ValidationError({'ends_at': "Can't book an apartment after it's closed."})
 
-        crossed_bookings = Booking.objects.filter(
-            apartment_id=self.apartment.pk).filter(
-            starts_at__range=[requested_start_date, requested_end_date]).filter(
-            ends_at__range=[requested_start_date, requested_end_date])
-        if crossed_bookings:
+        if Booking.objects.filter(
+                apartment_id=self.apartment.pk).filter(
+                starts_at__lte=requested_end_date).filter(
+                ends_at__gte=requested_start_date).exists():
             raise forms.ValidationError({
                 'starts_at': 'Some or all dates from the chosen date interval are already booked.'
             })
@@ -137,6 +129,12 @@ class BookingForm(forms.ModelForm):
     def clean(self):
         self.validate_booking_dates()
         return super().clean()
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.user = self.user
+        instance.apartment = self.apartment
+        instance.save()
 
 
 class ReviewForm(forms.ModelForm):
@@ -149,8 +147,8 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ['heading', 'text', 'rating']
 
-    def save_review_with_added_data(self):
-        form_instance = self.save(commit=False)
-        form_instance.user = self.user
-        form_instance.apartment = self.apartment
-        form_instance.save()
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.user = self.user
+        instance.apartment = self.apartment
+        instance.save()

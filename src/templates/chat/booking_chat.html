@@ -2,7 +2,7 @@
 {% block content %}
   {% if booking_messages %}
     {% for msg in booking_messages %}
-      <p>{{msg.sender.first_name}} {{msg.sender.last_name}}: {{msg.text}} ({{msg.timestamp}})</p>
+      <p>{{msg.sender.first_name}} {{msg.sender.last_name}}: {{msg.text}} ({{msg.created_at}})</p>
     {% endfor %}
   {% else %}
     <p>No messages yet! Feel free to start discussing the booking details.</p>

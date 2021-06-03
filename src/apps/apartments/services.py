@@ -1,18 +1,12 @@
-from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import SearchVector
 from django.core.paginator import Paginator
-from django.utils.dateformat import format
 
 from .models import Apartment, Booking
 
 from datetime import (
-    date,
     timedelta,
     datetime
 )
-
-User = get_user_model()
 
 
 def verify_apartment(apartment_pk):

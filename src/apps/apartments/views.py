@@ -31,13 +31,12 @@ def home(request):
 
 
 @login_required
-@verified_only
+# @verified_only
 def register_apartment(request):
     if request.method == 'POST':
-        user = request.user
-        form = ApartmentForm(request.POST, request.FILES, user=user)
+        form = ApartmentForm(request.POST, request.FILES, owner=request.user)
         if form.is_valid():
-            form.save_apartment_with_added_data()
+            form.save()
             messages.success(request, "Apartment registered successfully! Now it's on the inspection.")
             return redirect('home')
     else:
@@ -46,7 +45,7 @@ def register_apartment(request):
 
 
 @login_required
-@verified_only
+# @verified_only
 def unverified_apartment_list(request):
     if request.user.is_superuser:
         apartments = Apartment.objects.filter(is_verified=False)
@@ -57,7 +56,7 @@ def unverified_apartment_list(request):
 
 
 @login_required
-@verified_only
+# @verified_only
 def apartment_detail(request, apartment_pk):
     try:
         apartment = Apartment.objects.get(pk=apartment_pk)
@@ -79,7 +78,7 @@ def apartment_detail(request, apartment_pk):
 
 
 @login_required
-@verified_only
+# @verified_only
 def verify(request, apartment_pk):
     if request.user.is_superuser:
         try:
@@ -91,14 +90,14 @@ def verify(request, apartment_pk):
 
 
 @login_required
-@verified_only
+# @verified_only
 def profile_apartment_list(request):
     apartments = Apartment.objects.filter(owner_id=request.user.pk)
     return render(request, 'apartments/users_apartment_list.html', {'apartments': apartments})
 
 
 @login_required
-@verified_only
+# @verified_only
 def book_apartment(request, apartment_pk):
     try:
         apartment = Apartment.objects.get(pk=apartment_pk)
@@ -111,7 +110,7 @@ def book_apartment(request, apartment_pk):
     if request.method == 'POST':
         form = BookingForm(request.POST, user=request.user, apartment=apartment)
         if form.is_valid():
-            form.save_booking_with_added_data()
+            form.save()
             messages.success(request, 'Successfully booked!')
             return redirect('home')
     else:
@@ -121,7 +120,7 @@ def book_apartment(request, apartment_pk):
 
 
 @login_required
-@verified_only
+# @verified_only
 def bookings_list(request):
     bookings = Booking.objects.filter(
         user=request.user).annotate(
@@ -133,7 +132,7 @@ def bookings_list(request):
 
 
 @login_required
-@verified_only
+# @verified_only
 def post_review(request, apartment_pk):
     try:
         apartment = Apartment.objects.get(pk=apartment_pk)
@@ -147,7 +146,7 @@ def post_review(request, apartment_pk):
         if request.method == 'POST':
             form = ReviewForm(request.POST, user=user, apartment=apartment)
             if form.is_valid():
-                form.save_review_with_added_data()
+                form.save()
                 messages.success(request, 'Review created successfully!')
                 return redirect('apartment-detail', apartment_pk)
         else:
@@ -158,7 +157,7 @@ def post_review(request, apartment_pk):
 
 
 @login_required
-@verified_only
+# @verified_only
 def apartment_bound_bookings(request, apartment_pk):
     apartment = Apartment.objects.get(pk=apartment_pk)
     if request.user != apartment.owner:

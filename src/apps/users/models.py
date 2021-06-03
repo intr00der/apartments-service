@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .managers import UserManager
 from .validators import NameValidator
+from apartments.models import Country, City
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -18,12 +19,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(validators=[NameValidator], max_length=50)
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
-    country = models.ForeignKey(
-        'apartments.Country', on_delete=models.PROTECT, null=True, blank=True
-    )
-    city = models.ForeignKey(
-        'apartments.City', on_delete=models.PROTECT, null=True, blank=True
-    )
+    country = models.ForeignKey(Country, verbose_name='users', on_delete=models.PROTECT)
+    city = models.ForeignKey(City, verbose_name='users', on_delete=models.PROTECT)
     passport = models.FileField(
         upload_to='users/passport_scans/', null=True, blank=True
     )
