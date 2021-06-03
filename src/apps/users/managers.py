@@ -31,6 +31,7 @@ class UserManager(BaseUserManager):
             birthday=birthday,
             country_id=city,
             city_id=country,
+            is_verified=True,
             is_staff=True,
             is_superuser=True
         )
