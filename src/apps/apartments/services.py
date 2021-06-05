@@ -1,12 +1,17 @@
+import json
+
 from django.contrib.postgres.search import SearchVector
 from django.core.paginator import Paginator
+from django.db.models import When, Case, Prefetch
 
-from .models import Apartment, Booking
+from .models import Apartment, Booking, ApartmentPhoto
 
 from datetime import (
     timedelta,
     datetime
 )
+from pyproj import Proj, transform
+from math import sin, cos, sqrt, atan2, radians
 
 
 def verify_apartment(apartment_pk):
@@ -79,6 +84,7 @@ def filter_apartments_by_query(form, request):
     bedroom_amount_query = request.POST.get('bedroom_amount')
     convenience_item_query = request.POST.getlist('convenience_items')
     rating_query = request.POST.get('rating')
+    location_query = request.POST.get('location')
 
     if not square_area_query:
         square_area_query = 0
@@ -104,7 +110,45 @@ def filter_apartments_by_query(form, request):
             apartments = apartments.filter(convenience_items__contains=convenience_item_query)
         if rating_query != 0:
             apartments = apartments.filter(average_rating__gte=rating_query)
-        return apartments
+        if location_query:
+            lat1, lng1 = format_coordinates_to_lng_lat(query_str=location_query)
+            coord_dict = dict()
+            for apartment in apartments:
+                lat2_lng2 = apartment.lat_lng
+                coord_dict[apartment.pk] = calculate_distance(lat1, lng1, lat2_lng2[0], lat2_lng2[1])
+            whens = [When(pk=k, then=v) for k, v in coord_dict.items()]
+            apartments = apartments.annotate(distance=Case(*whens)).order_by('-distance')
+        # apartments = apartments.prefetch_related(
+        #     Prefetch(
+        #         'photos', queryset=ApartmentPhoto.objects.filter()
+        #     )
+        # )
+        apartments = apartments.prefetch_related('photos')
+    return apartments
+
+
+def format_coordinates_to_lng_lat(query_str):
+    query_dict = json.loads(query_str)
+    input_formatter = Proj('epsg:3857')
+    output_formatter = Proj('epsg:4326')
+    x, y = query_dict['coordinates'][0], query_dict['coordinates'][1]
+    lat, lng = transform(input_formatter, output_formatter, x, y)
+    return lat, lng
+
+
+def calculate_distance(lat1, lng1, lat2, lng2):
+    earth_radius = 6378.137
+    lat1 = radians(lat1)
+    lon1 = radians(lng1)
+    lat2 = radians(lat2)
+    lon2 = radians(lng2)
+    delta_lat = lat2 - lat1
+    delta_lon = lon2 - lon1
+
+    a = sin(delta_lat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(delta_lon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = round(earth_radius * c, 1)
+    return distance
 
 
 def get_apartments_page(form, request):

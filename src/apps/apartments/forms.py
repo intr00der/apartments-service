@@ -1,10 +1,10 @@
 from django import forms
+from django.contrib.gis import forms as gis_forms
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .models import Apartment, Booking, Review
-
 from .services import parse_date_string
 
 
@@ -19,12 +19,13 @@ class ApartmentForm(forms.ModelForm):
             'country', 'city', 'description',
             'square_area', 'room_amount', 'bedroom_amount',
             'daily_rate', 'registry_ordering', 'convenience_items',
-            'opens_at', 'closes_at'
+            'opens_at', 'closes_at', 'location'
         )
 
         widgets = {
             'opens_at': forms.TextInput(attrs={'class': 'genericDatepicker'}),
             'closes_at': forms.TextInput(attrs={'class': 'genericDatepicker'}),
+            'location': gis_forms.OSMWidget(attrs={'map_height': 500, 'map_width': 800})
         }
 
     def save(self, commit=True):
@@ -64,7 +65,7 @@ class ApartmentFilteringForm(forms.ModelForm):
         FOUR = 4, _('Four')
         FIVE = 5, _('More than four')
 
-    search_bar = forms.CharField(required=False, label='Search by country, city, description...')
+    search_bar = forms.CharField(required=False)
     room_amount = forms.ChoiceField(required=False, choices=AmountChoices.choices)
     bedroom_amount = forms.ChoiceField(required=False, choices=AmountChoices.choices)
     daily_rate = forms.IntegerField(required=False)
@@ -75,7 +76,11 @@ class ApartmentFilteringForm(forms.ModelForm):
 
     class Meta:
         model = Apartment
-        fields = ('square_area', 'room_amount', 'bedroom_amount', 'daily_rate', 'convenience_items')
+        fields = ('square_area', 'room_amount', 'bedroom_amount', 'daily_rate', 'convenience_items', 'location')
+        widgets = {
+            'location': gis_forms.OSMWidget(attrs={'map_height': 500, 'map_width': 800}),
+            'search_bar': forms.TextInput(attrs={'placeholder': 'Search by country, city, description...'})
+        }
 
     def compare_room_and_bedroom_amounts(self, *args, **kwargs):
         room_amount = self.cleaned_data['room_amount']
@@ -120,8 +125,8 @@ class BookingForm(forms.ModelForm):
 
         if Booking.objects.filter(
                 apartment_id=self.apartment.pk).filter(
-                starts_at__lte=requested_end_date).filter(
-                ends_at__gte=requested_start_date).exists():
+            starts_at__lte=requested_end_date).filter(
+            ends_at__gte=requested_start_date).exists():
             raise forms.ValidationError({
                 'starts_at': 'Some or all dates from the chosen date interval are already booked.'
             })

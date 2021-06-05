@@ -12,7 +12,7 @@ from .forms import (
     BookingForm,
     ReviewForm,
 )
-from .models import Apartment, Booking
+from .models import Apartment, Booking, ApartmentPhoto
 from .services import (
     verify_apartment,
     get_booked_days,
@@ -25,7 +25,7 @@ from users.services import verified_only
 
 @login_required
 def home(request):
-    form = ApartmentFilteringForm(request.GET)
+    form = ApartmentFilteringForm(request.POST)
     apartments_page = get_apartments_page(form, request)
     return render(request, 'apartments/home.html', {'apartments_page': apartments_page, 'form': form})
 
@@ -74,7 +74,8 @@ def apartment_detail(request, apartment_pk):
         else:
             form = ApartmentForm(instance=apartment)
         return render(request, 'apartments/apartment-form-profile.html', {'form': form})
-    return render(request, 'apartments/apartment_detail.html', {'apartment': apartment})
+    photos = ApartmentPhoto.objects.filter(apartment=apartment)
+    return render(request, 'apartments/apartment_detail.html', {'apartment': apartment, 'photos': photos})
 
 
 @login_required

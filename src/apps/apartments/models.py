@@ -1,4 +1,4 @@
-from django.contrib.gis.db.models import PointField
+from django.contrib.gis.db import models as gis_models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -63,12 +63,13 @@ class Apartment(models.Model):
     average_rating = models.FloatField(null=True, blank=True)
     opens_at = models.DateField(null=True, blank=True)
     closes_at = models.DateField(null=True, blank=True)
+    location = gis_models.PointField()
     is_open = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
 
     @property
     def lat_lng(self):
-        return list(getattr(self.point, 'coords', [])[::-1])
+        return getattr(self.location, 'coords', ())[::-1]
 
 
 class ApartmentPhoto(models.Model):
