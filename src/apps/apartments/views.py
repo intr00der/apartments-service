@@ -10,7 +10,7 @@ from .forms import (
     ApartmentForm,
     ApartmentFilteringForm,
     BookingForm,
-    ReviewForm,
+    ReviewForm, PhotoForm,
 )
 from .models import Apartment, Booking, ApartmentPhoto
 from .services import (
@@ -70,12 +70,59 @@ def apartment_detail(request, apartment_pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Changes made successfully!')
-                return render(request, 'apartment-detail', {'form': form})
         else:
             form = ApartmentForm(instance=apartment)
-        return render(request, 'apartments/apartment-form-profile.html', {'form': form})
-    photos = ApartmentPhoto.objects.filter(apartment=apartment)
+
+        photos = ApartmentPhoto.objects.filter(apartment=apartment).order_by('position')
+        context = {'form': form, 'photos': photos, 'apartment_pk': apartment_pk}
+        return render(request, 'apartments/apartment-form-profile.html', context)
+    photos = ApartmentPhoto.objects.filter(apartment=apartment).order_by('position')
     return render(request, 'apartments/apartment_detail.html', {'apartment': apartment, 'photos': photos})
+
+
+@login_required
+@verified_only
+def photo_detail(request, apartment_pk, photo_pk):
+    try:
+        photo = ApartmentPhoto.objects.filter(apartment_id=apartment_pk).get(pk=photo_pk)
+    except ApartmentPhoto.DoesNotExist:
+        messages.error(request, 'Such photo does not exist')
+        return redirect('home')
+    if request.user == photo.apartment.owner:
+        if request.method == 'POST':
+            form = PhotoForm(request.POST, request.FILES, instance=photo, apartment_pk=apartment_pk)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Photo saved successfully!')
+                return redirect('apartment-detail', apartment_pk)
+        else:
+            form = PhotoForm(instance=photo)
+        return render(request, 'apartments/photo_detail.html', {'photo': photo, 'form': form})
+    messages.error(request, "You can't choose photos for the apartment which you don't own.")
+    return redirect('home')
+
+
+@login_required
+@verified_only
+def add_photo(request, apartment_pk):
+    try:
+        apartment = Apartment.objects.get(pk=apartment_pk)
+    except Apartment.DoesNotExist:
+        messages.error(request, 'Such apartment does not exist.')
+        return redirect('home')
+
+    if request.user == apartment.owner:
+        if request.method == 'POST':
+            form = PhotoForm(request.POST, request.FILES, apartment_pk=apartment_pk)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Photo saved successfully!')
+                return redirect('apartment-photos', apartment_pk)
+        else:
+            form = PhotoForm()
+        return render(request, 'apartments/photo_detail.html', {'form': form})
+    messages.error(request, "You can't choose photos for the apartment which you don't own.")
+    return redirect('home')
 
 
 @login_required

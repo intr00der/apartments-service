@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from .models import Apartment, Booking, Review
+from .models import Apartment, Booking, Review, ApartmentPhoto
 from .services import parse_date_string
 
 
@@ -157,3 +157,20 @@ class ReviewForm(forms.ModelForm):
         instance.user = self.user
         instance.apartment = self.apartment
         instance.save()
+
+
+class PhotoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.apartment_pk = kwargs.pop('apartment_pk', [])
+        return super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = ApartmentPhoto
+        fields = ['photo', 'position']
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.apartment_id = self.apartment_pk
+        instance.save()
+
+
