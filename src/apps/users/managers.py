@@ -1,31 +1,37 @@
 from django.contrib.auth.base_user import BaseUserManager
 
+from datetime import date
+
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password, first_name,
-                    last_name, gender, born_at, country, city):
+    def create_user(self, email, password, first_name, last_name,
+                    gender, birthday, country, city, passport):
         user = self.model(
             email=self.normalize_email(email),
             password=password,
             first_name=first_name,
             last_name=last_name,
             gender=gender,
-            born_at=born_at,
+            birthday=birthday,
             country=country,
-            city=city
+            city=city,
+            passport=passport,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, first_name,
-                         last_name, gender):
+    def create_superuser(self, email, password, first_name, last_name,
+                         gender, birthday, country, city, ):
         user = self.model(
             email=self.normalize_email(email),
-            password=password,
             first_name=first_name,
             last_name=last_name,
             gender=gender,
+            birthday=birthday,
+            country_id=city,
+            city_id=country,
+            is_verified=True,
             is_staff=True,
             is_superuser=True
         )

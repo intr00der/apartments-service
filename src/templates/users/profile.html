@@ -1,12 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User Profile</title>
-</head>
-<body>
-    <h3>User profile: {{user.first_name}} {{user.last_name}}</h3>
-    <a href="{% url 'request-password-change' %}"><button>Change password</button></a>
-    <a href="{% url 'request-email-change' %}"><button>Change email</button></a>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>User profile</h3>
+<p>Email address: {{user.email}}</p>
+<form method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Save">
+</form>
+
+<a href="{% url 'request-password-change' %}"><button>Change password</button></a>
+<a href="{% url 'request-email-change' %}"><button>Change email</button></a>
+{% endblock content %}

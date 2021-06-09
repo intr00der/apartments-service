@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>List of your bookings</h3>
+{% if page %}
+    {% for booking in page %}
+        <p>Location: {{booking.apartment.city}}, {{booking.apartment.country}}</p>
+        <p>(Booking: {{booking.id}}, Apartment: {{booking.apartment.id}})</p>
+        <p>Period: {{booking.starts_at}} {{booking.ends_at}}</p>
+        <p>Daily rate: {{booking.apartment.daily_rate}}</p>
+        {% if booking.unread_messages != 0 %}
+            <p style="font-weight:bolder">Unread messages: {{booking.unread_messages}}</p>
+        {% endif %}
+        <p><a href="{% url 'booking-chat' booking.pk %}">Chat with owner</a></p>
+        {% if booking.unread_messages %}
+        YEAH
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>You don't have any bookings yet.</p>
+{% endif %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
+        </span>
+
+        {% if page.has_next %}
+            <a href="?page={{ page.next_page_number }}">next</a>
+            <a href="?page={{ page.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}

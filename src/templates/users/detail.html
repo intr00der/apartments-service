@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{user.first_name}} {{user.last_name}}</h2>
+<p>{{user.gender}}, {{user.age}}yr</p>
+<p>Email: {{user.email}}</p>
+
+{% if user.is_owner %}
+  <h2>User's apartments</h2>
+  <table>
+    {% for apartment in apartments %}
+    <tr>
+      <td>Location: {{apartment.city}}, {{apartment.country}},</td>
+      <td>{{apartment.room_amount}} rooms, {{apartment.bedroom_amount}} bedrooms </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+{% endblock %}

@@ -1,11 +1,8 @@
-from django.core.validators import (
-    MinValueValidator,
-    MaxValueValidator,
-)
+from django.contrib.gis.db.models import PointField
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from users.models import User
 from .fields import ChoiceArrayField
 
 
@@ -28,6 +25,7 @@ class City(models.Model):
 
 class Apartment(models.Model):
     class Amount(models.IntegerChoices):
+        NULL = 0, _('not specified')
         ONE = 1, _('one')
         TWO = 2, _('two')
         THREE = 3, _('three')
@@ -45,7 +43,7 @@ class Apartment(models.Model):
         CLEAN_LINEN = 'CLLN', _('Clean linen')
 
     owner = models.ForeignKey(
-        User, related_name='apartments', on_delete=models.CASCADE
+        'users.User', related_name='apartments', on_delete=models.CASCADE
     )
     country = models.ForeignKey(
         Country, related_name='apartments', on_delete=models.PROTECT
@@ -54,14 +52,26 @@ class Apartment(models.Model):
         City, related_name='apartments', on_delete=models.PROTECT
     )
     description = models.TextField()
+    square_area = models.PositiveSmallIntegerField()
     room_amount = models.IntegerField(choices=Amount.choices)
     bedroom_amount = models.IntegerField(choices=Amount.choices)
     daily_rate = models.DecimalField(max_digits=9, decimal_places=2)
     registry_ordering = models.FileField(upload_to='apartments/registry_scans/')
     convenience_items = ChoiceArrayField(
-        models.CharField(max_length=50, choices=ConvenienceItems.choices)
+        models.CharField(default=None, max_length=50, choices=ConvenienceItems.choices, blank=True, null=True)
     )
+    average_rating = models.FloatField(null=True, blank=True)
+    opens_at = models.DateField(null=True, blank=True)
+    closes_at = models.DateField(null=True, blank=True)
+    is_open = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+
+    @property
+    def lat_lng(self):
+        coords = getattr(self.location, 'coords', ())[::-1]
+        lat = coords[0]
+        lng = coords[1]
+        return lat, lng
 
 
 class ApartmentPhoto(models.Model):
@@ -72,26 +82,24 @@ class ApartmentPhoto(models.Model):
     position = models.IntegerField(null=True, blank=True)
 
 
-class Reservation(models.Model):
+class Booking(models.Model):
     user = models.ForeignKey(
-        User, related_name='reservations', on_delete=models.PROTECT
+        'users.User', related_name='bookings', on_delete=models.PROTECT
     )
     apartment = models.ForeignKey(
-        Apartment, related_name='reservations', on_delete=models.PROTECT
+        Apartment, related_name='bookings', on_delete=models.PROTECT
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    starts_at = models.DateTimeField()
-    ends_at = models.DateTimeField()
+    created_at = models.DateField(auto_now_add=True)
+    starts_at = models.DateField()
+    ends_at = models.DateField()
 
 
 class Review(models.Model):
     user = models.ForeignKey(
-        User, related_name='reviews', on_delete=models.CASCADE)
+        'users.User', related_name='reviews', on_delete=models.CASCADE)
     apartment = models.ForeignKey(
         Apartment, related_name='reviews', on_delete=models.CASCADE
     )
     heading = models.CharField(max_length=200)
     text = models.TextField()
-    rating = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(5)]
-    )
+    rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])

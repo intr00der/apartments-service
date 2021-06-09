@@ -1,39 +1,54 @@
+from functools import wraps
+
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_text
 from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
-from six import text_type
-
 from conf import settings
+
+from datetime import date
+from six import text_type
 
 User = get_user_model()
 
 
 def create_user_by_form(user_model, form):
     user = user_model.objects.create_user(
-        email=form.cleaned_data.get('email'),
-        password=form.cleaned_data.get('password'),
-        first_name=form.cleaned_data.get('first_name'),
-        last_name=form.cleaned_data.get('last_name'),
-        gender=form.cleaned_data.get('gender'),
-        born_at=form.cleaned_data.get('born_at'),
-        country=form.cleaned_data.get('country'),
-        city=form.cleaned_data.get('city')
+        email=form.cleaned_data['email'],
+        password=form.cleaned_data['password'],
+        first_name=form.cleaned_data['first_name'],
+        last_name=form.cleaned_data['last_name'],
+        gender=form.cleaned_data['gender'],
+        birthday=form.cleaned_data['birthday'],
+        country=form.cleaned_data['country'],
+        city=form.cleaned_data['city'],
+        passport=form.cleaned_data['passport']
     )
     return user
 
 
 def authenticate_user_by_form(form, request):
-    email = form.cleaned_data.get('email')
-    password = form.cleaned_data.get('password')
+    email = form.cleaned_data['email']
+    password = form.cleaned_data['password']
     user = authenticate(request, email=email, password=password)
     return user
+
+
+def verified_only(function):
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
+        is_verified = request.user.is_verified
+        if is_verified:
+            return function(request, *args, **kwargs)
+        return render(request, 'users/verification_warning.html')
+    return wrap
 
 
 class AppTokenGenerator(PasswordResetTokenGenerator):
@@ -80,12 +95,18 @@ def sync_token(uidb64, token):
 
 
 def set_password_by_form(form, user):
-    password = form.cleaned_data.get('password')
+    password = form.cleaned_data['password']
     user.set_password(password)
     user.save()
 
 
 def set_email_by_form(form, user):
-    email = form.cleaned_data.get('email')
+    email = form.cleaned_data['email']
     user.email = email
     user.save()
+
+
+def get_age(user):
+    lifespan = date.today() - user.birthday
+    lifespan_years = int(lifespan.days / 365)
+    return lifespan_years

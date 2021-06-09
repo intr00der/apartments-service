@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Apartment details</h2>
+  <a href="{% url 'user-detail' user_pk=apartment.owner.pk %}">
+    Owner: {{apartment.owner.first_name}} {{apartment.owner.last_name}}
+  </a>
+
+  <p>Location: {{apartment.city}}, {{apartment.country}}</p>
+  <p>{{apartment.description}}</p>
+  <ul>
+    <p>Convenience items:</p>
+    {% for item in apartment.convenience_items %}
+    <li>{{item}}</li>
+    {% endfor %}
+  </ul>
+  <p><a href="{% url 'review' apartment.pk %}">Leave a review</a></p>
+  <p><a href="{% url 'book-apartment' apartment.pk %}">Book</a></p>
+{% endblock content %}

@@ -1,0 +1,16 @@
+asgiref==3.3.4
+Django==3.2.2
+django-autoslug==1.9.8
+django-environ==0.4.5
+env==0.1.0
+numpy==1.20.3
+pandas==1.2.4
+Pillow==8.2.0
+progressbar2==3.53.1
+psycopg2-binary==2.8.5
+python-dateutil==2.8.1
+python-utils==2.5.6
+pytz==2021.1
+six==1.16.0
+sqlparse==0.4.1
+Unidecode==1.2.0

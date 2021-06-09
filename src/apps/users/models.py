@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .managers import UserManager
 from .validators import NameValidator
+from apartments.models import Country, City
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -16,18 +17,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, max_length=255, blank=False)
     first_name = models.CharField(validators=[NameValidator], max_length=50)
     last_name = models.CharField(validators=[NameValidator], max_length=50)
-    gender = models.IntegerField(choices=GenderChoices.choices)
-    born_at = models.DateField(null=True, blank=True)
-    country = models.ForeignKey(
-        'apartments.Country', on_delete=models.PROTECT, null=True, blank=True
-    )
-    city = models.ForeignKey(
-        'apartments.City', on_delete=models.PROTECT, null=True, blank=True
-    )
+    gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
+    birthday = models.DateField(null=True, blank=True)
+    country = models.ForeignKey(Country, verbose_name='users', on_delete=models.PROTECT)
+    city = models.ForeignKey(City, verbose_name='users', on_delete=models.PROTECT)
     passport = models.FileField(
         upload_to='users/passport_scans/', null=True, blank=True
     )
-    is_owner = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -41,4 +37,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = [
         'password', 'first_name',
         'last_name', 'gender',
+        'birthday', 'country',
+        'city'
     ]
