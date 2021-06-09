@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <h2>Your apartments</h2>
 {% if apartments %}
   <table>
@@ -21,5 +20,4 @@
 {% else %}
   <p>You don't have any apartments yet. <a href="{% url 'register-apartment' %}">Register an apartment</a></p>
 {% endif %}
-
 {% endblock %}

@@ -13,8 +13,8 @@
 </div>
 
 <h3>Available apartments</h3>
-{% if apartments_page %}
-    {% for apartment in apartments_page %}
+{% if page %}
+    {% for apartment in page %}
         <p>{{apartment.city}}, {{apartment.country}}</p>
         <p>{{apartment.daily_rate}}</p>
         <p>Distance from you: {{apartment.distance}} km</p>

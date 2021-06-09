@@ -1,15 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<h3>Apartment profile</h3>
 
-    <h3>Apartment profile</h3>
-
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{form.media}}
-        {{form.as_p}}
-        <input type="submit" value="Save">
-    </form>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.media}}
+    {{form.as_p}}
+    <input type="submit" value="Save">
+</form>
 
 {% for photo in photos.all %}
     <p><img src="{{photo.photo.url}}"></p>
@@ -18,5 +17,3 @@
 {% endfor %}
 
 {% endblock content %}
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>

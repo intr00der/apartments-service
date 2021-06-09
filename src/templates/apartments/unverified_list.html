@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <h2>Unverified apartment list</h2>
 <a href="{% url 'home' %}"><input type="button" value="Back to home page"></a>
 <a href="{% url 'profile' %}"><input type="button" value="Back to profile"></a>
@@ -16,5 +15,4 @@
       </tr>
   {% endfor %}
 </table>
-
 {% endblock content %}
