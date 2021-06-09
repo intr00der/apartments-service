@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block content %}
 
+{% block content %}
 <h3>List of your bookings</h3>
-{% if bookings_page %}
-    {% for booking in bookings_page %}
+{% if page %}
+    {% for booking in page %}
         <p>Location: {{booking.apartment.city}}, {{booking.apartment.country}}</p>
         <p>(Booking: {{booking.id}}, Apartment: {{booking.apartment.id}})</p>
         <p>Period: {{booking.starts_at}} {{booking.ends_at}}</p>
@@ -22,20 +22,19 @@
 
 <div class="pagination">
     <span class="step-links">
-        {% if bookings_page.has_previous %}
+        {% if page.has_previous %}
             <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ bookings_page.previous_page_number }}">previous</a>
+            <a href="?page={{ page.previous_page_number }}">previous</a>
         {% endif %}
 
         <span class="current">
-            Page {{ bookings_page.number }} of {{ bookings_page.paginator.num_pages }}.
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
         </span>
 
-        {% if bookings_page.has_next %}
-            <a href="?page={{ bookings_page.next_page_number }}">next</a>
-            <a href="?page={{ bookings_page.paginator.num_pages }}">last &raquo;</a>
+        {% if page.has_next %}
+            <a href="?page={{ page.next_page_number }}">next</a>
+            <a href="?page={{ page.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
 </div>
-
 {% endblock %}

@@ -28,4 +28,5 @@ class BookingMessageForm(forms.ModelForm):
         instance.booking = self.booking
         instance.is_seen_by_client = self.is_seen_by_client
         instance.is_seen_by_owner = self.is_seen_by_owner
-        instance.save()
+        if commit:
+            instance.save()

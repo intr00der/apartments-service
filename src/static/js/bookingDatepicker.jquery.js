@@ -1,4 +1,4 @@
-function DisableDates(date) {
+function formatAndDisableDates(date) {
     const string = jQuery.datepicker.formatDate('yy-mm-dd', date);
     return [bookedDays.indexOf(string) == -1];
 }
@@ -8,6 +8,6 @@ $(document).ready(function () {
         minDate: new Date(opensAt),
         maxDate: new Date(closesAt),
         dateFormat: "dd.mm.yy",
-        beforeShowDay: DisableDates,
+        beforeShowDay: formatAndDisableDates,
     });
 });

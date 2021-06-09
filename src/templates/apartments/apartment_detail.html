@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Apartment Details</title>
-</head>
-<body>
 {% extends 'base.html' %}
-{% block content %}
 
+{% block content %}
   <h2>Apartment details</h2>
   <a href="{% url 'user-detail' user_pk=apartment.owner.pk %}">
     Owner: {{apartment.owner.first_name}} {{apartment.owner.last_name}}
@@ -23,7 +16,4 @@
   </ul>
   <p><a href="{% url 'review' apartment.pk %}">Leave a review</a></p>
   <p><a href="{% url 'book-apartment' apartment.pk %}">Book</a></p>
-
 {% endblock content %}
-</body>
-</html>

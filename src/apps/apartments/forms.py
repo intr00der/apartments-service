@@ -30,7 +30,8 @@ class ApartmentForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.owner = self.owner
-        instance.save()
+        if commit:
+            instance.save()
 
     def compare_room_and_bedroom_amounts(self):
         room_amount = self.cleaned_data['room_amount']
@@ -134,7 +135,8 @@ class BookingForm(forms.ModelForm):
         instance = super().save(commit=False)
         instance.user = self.user
         instance.apartment = self.apartment
-        instance.save()
+        if commit:
+            instance.save()
 
 
 class ReviewForm(forms.ModelForm):
@@ -151,4 +153,5 @@ class ReviewForm(forms.ModelForm):
         instance = super().save(commit=False)
         instance.user = self.user
         instance.apartment = self.apartment
-        instance.save()
+        if commit:
+            instance.save()
