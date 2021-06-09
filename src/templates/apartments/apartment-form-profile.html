@@ -1,5 +1,5 @@
-
 {% extends 'base.html' %}
+
 {% block content %}
 
     <h3>Apartment profile</h3>
@@ -17,12 +17,6 @@
     <p><a href="{% url 'photo-detail' photo_pk=photo.pk apartment_pk=apartment_pk %}">Change</a></p>
 {% endfor %}
 
-
 {% endblock content %}
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script>
-    $(document).ready( function() {
-        $( ".datepicker" ).datepicker();
-    });
-</script>

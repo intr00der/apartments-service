@@ -69,7 +69,10 @@ class Apartment(models.Model):
 
     @property
     def lat_lng(self):
-        return getattr(self.location, 'coords', ())[::-1]
+        coords = getattr(self.location, 'coords', ())[::-1]
+        lat = coords[0]
+        lng = coords[1]
+        return lat, lng
 
 
 class ApartmentPhoto(models.Model):

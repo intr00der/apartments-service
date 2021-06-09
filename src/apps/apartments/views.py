@@ -26,8 +26,8 @@ from users.services import verified_only
 @login_required
 def home(request):
     form = ApartmentFilteringForm(request.POST)
-    apartments_page = get_apartments_page(form, request)
-    return render(request, 'apartments/home.html', {'apartments_page': apartments_page, 'form': form})
+    page = get_apartments_page(form, request)
+    return render(request, 'apartments/home.html', {'page': page, 'form': form})
 
 
 @login_required
@@ -217,6 +217,6 @@ def apartment_bound_bookings(request, apartment_pk):
         unread_messages=Count('booking_messages',
                               filter=Q(booking_messages__receiver=request.user, booking_messages__read=False))) \
         .order_by('unread_messages')
-    bookings_page = get_bookings_page(request, bookings)
-    context = {'apartment': apartment, 'bookings_page': bookings_page}
+    page = get_bookings_page(request, bookings)
+    context = {'apartment': apartment, 'page': page}
     return render(request, 'apartments/apartment_bound_bookings.html', context)

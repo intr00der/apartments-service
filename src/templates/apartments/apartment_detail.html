@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block content %}
   <h2>Apartment details</h2>
   <a href="{% url 'user-detail' user_pk=apartment.owner.pk %}">
