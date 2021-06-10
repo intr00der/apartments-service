@@ -15,5 +15,6 @@
     <p>Position: {{photo.position}}</p>
     <p><a href="{% url 'photo-detail' photo_pk=photo.pk apartment_pk=apartment_pk %}">Change</a></p>
 {% endfor %}
+<p><a href="url 'photo-add' apartment_pk=apartment_pk">Add photo</a></p>
 
 {% endblock content %}

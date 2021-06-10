@@ -84,11 +84,11 @@ def apartment_detail(request, apartment_pk):
 @verified_only
 def photo_detail(request, apartment_pk, photo_pk):
     try:
-        photo = ApartmentPhoto.objects.filter(apartment_id=apartment_pk).get(pk=photo_pk)
+        photo = ApartmentPhoto.objects.select_related('apartment').get(apartment_id=apartment_pk, pk=photo_pk)
     except ApartmentPhoto.DoesNotExist:
         messages.error(request, 'Such photo does not exist')
         return redirect('home')
-    if request.user == photo.apartment.owner:
+    if request.user.id == photo.apartment.owner_id:
         if request.method == 'POST':
             form = PhotoForm(request.POST, request.FILES, instance=photo, apartment_pk=apartment_pk)
             if form.is_valid():
@@ -111,13 +111,13 @@ def add_photo(request, apartment_pk):
         messages.error(request, 'Such apartment does not exist.')
         return redirect('home')
 
-    if request.user == apartment.owner:
+    if request.user.id == apartment.owner_id:
         if request.method == 'POST':
             form = PhotoForm(request.POST, request.FILES, apartment_pk=apartment_pk)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Photo saved successfully!')
-                return redirect('apartment-photos', apartment_pk)
+                return redirect('apartment-detail', apartment_pk)
         else:
             form = PhotoForm()
         return render(request, 'apartments/photo_detail.html', {'form': form})
@@ -163,8 +163,8 @@ def book_apartment(request, apartment_pk):
             return redirect('home')
     else:
         form = BookingForm()
-    return render(request, 'apartments/book_apartment.html',
-                  {'apartment': apartment, 'form': form, 'booked_days': booked_days_json})
+    context = {'apartment': apartment, 'form': form, 'booked_days': booked_days_json}
+    return render(request, 'apartments/book_apartment.html', context)
 
 
 @login_required
@@ -175,8 +175,8 @@ def bookings_list(request):
         unread_messages=Count('booking_messages',
                               filter=Q(booking_messages__receiver=request.user, booking_messages__read=False))) \
         .order_by('unread_messages')
-    bookings_page = get_bookings_page(request, bookings)
-    return render(request, 'apartments/booking_list.html', {'bookings_page': bookings_page})
+    page = get_bookings_page(request, bookings)
+    return render(request, 'apartments/booking_list.html', {'page': page})
 
 
 @login_required
@@ -208,7 +208,7 @@ def post_review(request, apartment_pk):
 @verified_only
 def apartment_bound_bookings(request, apartment_pk):
     apartment = Apartment.objects.get(pk=apartment_pk)
-    if request.user != apartment.owner:
+    if request.user.id != apartment.owner_id:
         messages.error(request, "You're not allowed to see the bookings on an apartment which doesn't belong to you.")
         return redirect('home')
 

@@ -13,15 +13,10 @@
     {% for item in apartment.convenience_items %}
     <li>{{item}}</li>
     {% endfor %}
-    {% for photo in photos %}
-      <img src="{{photo.photo.url}}">
-    {% endfor %}
   </ul>
 
-  {% for photo in photos.all %}
+  {% for photo in photos %}
     <p><img src="{{photo.photo.url}}"></p>
-    <p>Position: {{photo.position}}</p>
-    <p><a href="{% url 'photo-detail' photo_pk=photo.pk apartment_pk=apartment.pk %}">Change</a></p>
   {% endfor %}
   <p><a href="{% url 'review' apartment.pk %}">Leave a review</a></p>
   <p><a href="{% url 'book-apartment' apartment.pk %}">Book</a></p>

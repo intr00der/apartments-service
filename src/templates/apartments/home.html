@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tags %}
 
 {% block content %}
 <h1>Home page!</h1>
@@ -17,7 +18,9 @@
     {% for apartment in page %}
         <p>{{apartment.city}}, {{apartment.country}}</p>
         <p>{{apartment.daily_rate}}</p>
-        <p>Distance from you: {{apartment.distance}} km</p>
+        {% if apartment.distance %}
+            <p>Distance from you: {{apartment.distance.km|round_by_two}} km</p>
+        {% endif %}
         {% with apartment.photos.first as photo %}
             <img src="{{photo.photo.url}}">
         {% endwith %}
@@ -27,21 +30,5 @@
     <p>None are found or available with requested features.</p>
 {% endif %}
 
-<div class="pagination">
-    <span class="step-links">
-        {% if page.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ page.number }} of {{ page.paginator.num_pages }}.
-        </span>
-
-        {% if page.has_next %}
-            <a href="?page={{ page.next_page_number }}">next</a>
-            <a href="?page={{ page.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
+{% include 'pagination.html' %}
 {% endblock content %}

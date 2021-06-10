@@ -11,6 +11,7 @@ from .views import (
     bookings_list,
     apartment_bound_bookings,
     photo_detail,
+    add_photo,
 )
 
 urlpatterns = [
@@ -24,5 +25,6 @@ urlpatterns = [
     path('apartments/<apartment_pk>/review/', post_review, name='review'),
     path('apartments/<apartment_pk>/verify/', verify, name='verify'),
     path('apartments/<apartment_pk>/bookings/', apartment_bound_bookings, name='apartment-bound-bookings'),
-    path('apartments/<apartment_pk>/photos/<photo_pk>/', photo_detail, name='photo-detail')
+    path('apartments/<apartment_pk>/photos/<photo_pk>/', photo_detail, name='photo-detail'),
+    path('apartments/<apartment_pk>/add-photo/', add_photo, name='photo-add'),
 ]
