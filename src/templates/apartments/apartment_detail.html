@@ -14,6 +14,10 @@
     <li>{{item}}</li>
     {% endfor %}
   </ul>
+
+  {% for photo in photos %}
+    <p><img src="{{photo.photo.url}}"></p>
+  {% endfor %}
   <p><a href="{% url 'review' apartment.pk %}">Leave a review</a></p>
   <p><a href="{% url 'book-apartment' apartment.pk %}">Book</a></p>
 {% endblock content %}

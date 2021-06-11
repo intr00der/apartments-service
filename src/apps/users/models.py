@@ -19,8 +19,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(validators=[NameValidator], max_length=50)
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
-    country = models.ForeignKey(Country, verbose_name='users', on_delete=models.PROTECT)
-    city = models.ForeignKey(City, verbose_name='users', on_delete=models.PROTECT)
+    country = models.ForeignKey(Country, verbose_name='country', on_delete=models.PROTECT)
+    city = models.ForeignKey(City, verbose_name='city', on_delete=models.PROTECT)
     passport = models.FileField(
         upload_to='users/passport_scans/', null=True, blank=True
     )

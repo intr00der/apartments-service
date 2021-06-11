@@ -11,11 +11,11 @@ def booking_chat(request, booking_id):
     try:
         booking = Booking.objects.get(pk=booking_id)
     except Booking.DoesNotExist:
-        messages.error(request, 'The booking does not exist.')
+        messages.error(request, _('The booking does not exist.'))
         return redirect('home')
 
     if request.user != booking.user and request.user != booking.apartment.owner:
-        messages.error(request, "You're not allowed to participate in the chat of someone else's booking!")
+        messages.error(request, _("You're not allowed to participate in the chat of someone else's booking!"))
         return redirect('bookings-list')
 
     booking_messages = BookingMessage.objects.filter(booking_id=booking_id)

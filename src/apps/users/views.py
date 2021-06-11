@@ -3,6 +3,8 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect
+from django.utils.translation import gettext_lazy as _
+
 
 from .forms import (
     RegisterForm,
@@ -52,7 +54,7 @@ def email_verification(request, uidb64, token):
 
     user.is_verified = True
     user.save()
-    messages.success(request, "You've successfully verified your email address.")
+    messages.success(request, _("You've successfully verified your email address."))
     return redirect('home')
 
 
@@ -106,7 +108,7 @@ def password_change(request, uidb64, token):
     if form.is_valid():
         set_password_by_form(form, user)
         logout(request)
-        messages.success(request, "You've successfully changed your password. Log in to continue.")
+        messages.success(request, _("You've successfully changed your password. Log in to continue."))
         return redirect('login')
     return render(request, 'users/change_password.html', {'form': form})
 
@@ -134,7 +136,7 @@ def email_change(request, uidb64, token):
     if form.is_valid():
         set_email_by_form(form, user)
         logout(request)
-        messages.success(request, "You've successfully changed your email. Log in to continue.")
+        messages.success(request, _("You've successfully changed your email. Log in to continue."))
         redirect('login')
     return render(request, 'users/change_email.html', {'form': form})
 
@@ -146,7 +148,7 @@ def user_detail(request, user_pk):
         try:
             user = User.objects.get(pk=user_pk)
         except User.DoesNotExist:
-            messages.error(request, "Such user doesn't exist.")
+            messages.error(request, _("Such user doesn't exist."))
 
         user.age = get_age(user)
         apartments = Apartment.objects.filter(owner_id=user_pk)

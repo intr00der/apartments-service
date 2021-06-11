@@ -1,3 +1,5 @@
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
 from django.contrib.postgres.search import SearchVector
 from django.core.paginator import Paginator
 
@@ -7,6 +9,10 @@ from datetime import (
     timedelta,
     datetime
 )
+from pyproj import Proj, transform
+from math import sin, cos, sqrt, atan2, radians
+
+import json
 
 
 def verify_apartment(apartment_pk):
@@ -63,7 +69,7 @@ def get_available_days(apartment):
 
 
 def can_review(user, apartment):
-    if user == apartment.owner:
+    if user.id == apartment.owner_id:
         return False, "You can't leave a review on your own apartment."
     if not Booking.objects.filter(apartment=apartment, user=user):
         return False, "You can't leave a review on an apartment which you've never visited."
@@ -79,6 +85,7 @@ def filter_apartments_by_query(form, request):
     bedroom_amount_query = request.POST.get('bedroom_amount')
     convenience_item_query = request.POST.getlist('convenience_items')
     rating_query = request.POST.get('rating')
+    location_query = request.POST.get('location')
 
     if not square_area_query:
         square_area_query = 0
@@ -87,8 +94,6 @@ def filter_apartments_by_query(form, request):
     if not rating_query:
         rating_query = 0
     if form.is_valid():
-        form.save(commit=False)
-
         if text_query:
             apartments = apartments.annotate(
                 search=SearchVector('country__name') + SearchVector('city__name') + SearchVector('description')
@@ -104,7 +109,21 @@ def filter_apartments_by_query(form, request):
             apartments = apartments.filter(convenience_items__contains=convenience_item_query)
         if rating_query != 0:
             apartments = apartments.filter(average_rating__gte=rating_query)
-        return apartments
+        if location_query:
+            query_point = format_coord_string_to_point(query_str=location_query)
+            apartments = apartments.annotate(distance=Distance('location', query_point)).order_by('-distance')
+        apartments = apartments.prefetch_related('apartmentphoto_set')
+    return apartments
+
+
+def format_coord_string_to_point(query_str):
+    query_dict = json.loads(query_str)
+    input_formatter = Proj('epsg:3857')
+    output_formatter = Proj('epsg:4326')
+    x, y = query_dict['coordinates'][0], query_dict['coordinates'][1]
+    lat, lng = transform(input_formatter, output_formatter, x, y)
+    location = Point(x=lng, y=lat, srid=4326)
+    return location
 
 
 def get_apartments_page(form, request):

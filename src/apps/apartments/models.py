@@ -1,7 +1,7 @@
-from django.contrib.gis.db.models import PointField
+from django.contrib.gis.db import models as gis_models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .fields import ChoiceArrayField
 
@@ -16,7 +16,7 @@ class Country(models.Model):
 class City(models.Model):
     name = models.CharField(max_length=100)
     country = models.ForeignKey(
-        Country, related_name='cities', on_delete=models.CASCADE
+        Country, on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -43,13 +43,13 @@ class Apartment(models.Model):
         CLEAN_LINEN = 'CLLN', _('Clean linen')
 
     owner = models.ForeignKey(
-        'users.User', related_name='apartments', on_delete=models.CASCADE
+        'users.User', on_delete=models.CASCADE
     )
     country = models.ForeignKey(
-        Country, related_name='apartments', on_delete=models.PROTECT
+        Country, on_delete=models.PROTECT
     )
     city = models.ForeignKey(
-        City, related_name='apartments', on_delete=models.PROTECT
+        City, on_delete=models.PROTECT
     )
     description = models.TextField()
     square_area = models.PositiveSmallIntegerField()
@@ -63,20 +63,14 @@ class Apartment(models.Model):
     average_rating = models.FloatField(null=True, blank=True)
     opens_at = models.DateField(null=True, blank=True)
     closes_at = models.DateField(null=True, blank=True)
+    location = gis_models.PointField()
     is_open = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
-
-    @property
-    def lat_lng(self):
-        coords = getattr(self.location, 'coords', ())[::-1]
-        lat = coords[0]
-        lng = coords[1]
-        return lat, lng
 
 
 class ApartmentPhoto(models.Model):
     apartment = models.ForeignKey(
-        Apartment, related_name='photos', on_delete=models.CASCADE
+        Apartment, on_delete=models.CASCADE
     )
     photo = models.ImageField(upload_to='apartments/images/')
     position = models.IntegerField(null=True, blank=True)
@@ -84,10 +78,10 @@ class ApartmentPhoto(models.Model):
 
 class Booking(models.Model):
     user = models.ForeignKey(
-        'users.User', related_name='bookings', on_delete=models.PROTECT
+        'users.User', on_delete=models.PROTECT
     )
     apartment = models.ForeignKey(
-        Apartment, related_name='bookings', on_delete=models.PROTECT
+        Apartment, on_delete=models.PROTECT
     )
     created_at = models.DateField(auto_now_add=True)
     starts_at = models.DateField()
@@ -96,9 +90,9 @@ class Booking(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(
-        'users.User', related_name='reviews', on_delete=models.CASCADE)
+        'users.User', on_delete=models.CASCADE)
     apartment = models.ForeignKey(
-        Apartment, related_name='reviews', on_delete=models.CASCADE
+        Apartment, on_delete=models.CASCADE
     )
     heading = models.CharField(max_length=200)
     text = models.TextField()
