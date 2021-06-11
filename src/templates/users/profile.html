@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <h3>User profile</h3>
 <p>Email address: {{user.email}}</p>
 <form method="post">
@@ -12,5 +11,4 @@
 
 <a href="{% url 'request-password-change' %}"><button>Change password</button></a>
 <a href="{% url 'request-email-change' %}"><button>Change email</button></a>
-
 {% endblock content %}

@@ -34,7 +34,6 @@ class ApartmentForm(forms.ModelForm):
         if commit:
             instance.save()
 
-
     def compare_room_and_bedroom_amounts(self):
         room_amount = self.cleaned_data['room_amount']
         bedroom_amount = self.cleaned_data['bedroom_amount']
@@ -145,7 +144,6 @@ class BookingForm(forms.ModelForm):
             instance.save()
 
 
-
 class ReviewForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', [])
@@ -163,7 +161,6 @@ class ReviewForm(forms.ModelForm):
         if commit:
             instance.save()
 
-
 class PhotoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.apartment_pk = kwargs.pop('apartment_pk', [])
@@ -178,6 +175,4 @@ class PhotoForm(forms.ModelForm):
         instance.apartment_id = self.apartment_pk
         if commit:
             instance.save()
-
-
 
