@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load tags %}
 
 {% block content %}
 <h1>Home page!</h1>
@@ -19,7 +18,7 @@
         <p>{{apartment.city}}, {{apartment.country}}</p>
         <p>{{apartment.daily_rate}}</p>
         {% if apartment.distance %}
-            <p>Distance from you: {{apartment.distance.km|round_by_two}} km</p>
+            <p>Distance from you: {{apartment.distance.km|floatformat:1}} km</p>
         {% endif %}
         {% with apartment.photos.first as photo %}
             <img src="{{photo.photo.url}}">

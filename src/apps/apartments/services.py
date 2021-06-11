@@ -112,7 +112,7 @@ def filter_apartments_by_query(form, request):
         if location_query:
             query_point = format_coord_string_to_point(query_str=location_query)
             apartments = apartments.annotate(distance=Distance('location', query_point)).order_by('-distance')
-        apartments = apartments.prefetch_related('photos')
+        apartments = apartments.prefetch_related('apartmentphoto_set')
     return apartments
 
 
