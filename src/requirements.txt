@@ -14,11 +14,14 @@ daphne==3.0.2
 Django==3.2.2
 django-autoslug==1.9.8
 django-environ==0.4.5
+django-filter==2.4.0
+djangorestframework==3.12.4
 env==0.1.0
 hiredis==2.0.0
 hyperlink==21.0.0
 idna==3.2
 incremental==21.3.0
+Markdown==3.3.4
 msgpack==1.0.2
 Pillow==8.2.0
 progressbar2==3.53.1

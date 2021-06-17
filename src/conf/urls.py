@@ -6,9 +6,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('apartments.urls')),
-    path('', include('users.urls')),
-    path('', include('chat.urls'))
+    path('api/v1/', include('rest_framework.urls')),
+    path('api/v1/', include('apartments.urls')),
+    path('api/v1/', include('users.urls')),
+    path('api/v1/', include('chat.urls'))
 ]
 
 if settings.DEBUG:
