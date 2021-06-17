@@ -1,7 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
 
-from datetime import date
-
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password, first_name, last_name,
@@ -13,8 +11,8 @@ class UserManager(BaseUserManager):
             last_name=last_name,
             gender=gender,
             birthday=birthday,
-            country=country,
-            city=city,
+            country_id=country,
+            city_id=city,
             passport=passport,
         )
         user.set_password(password)
@@ -22,7 +20,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, first_name, last_name,
-                         gender, birthday, country, city, ):
+                         gender, birthday, country, city):
         user = self.model(
             email=self.normalize_email(email),
             first_name=first_name,
