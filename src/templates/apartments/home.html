@@ -4,8 +4,7 @@
 <h1>Home page!</h1>
 
 <div id="map">
-    <form method="post">
-        {% csrf_token %}
+    <form method="get">
         {{form.media}}
         {{form.as_p}}
         <input type="submit" value="Search">

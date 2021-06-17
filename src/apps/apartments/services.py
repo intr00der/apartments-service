@@ -10,7 +10,6 @@ from datetime import (
     datetime
 )
 from pyproj import Proj, transform
-from math import sin, cos, sqrt, atan2, radians
 
 import json
 
@@ -76,62 +75,53 @@ def can_review(user, apartment):
     return True, None
 
 
-def filter_apartments_by_query(form, request):
+def filter_apartments_by_query(query_params):
     apartments = Apartment.objects.filter(is_verified=True)
-    text_query = request.POST.get('search_bar')
-    daily_rate_query = request.POST.get('daily_rate')
-    square_area_query = request.POST.get('square_area')
-    room_amount_query = request.POST.get('room_amount')
-    bedroom_amount_query = request.POST.get('bedroom_amount')
-    convenience_item_query = request.POST.getlist('convenience_items')
-    rating_query = request.POST.get('rating')
-    location_query = request.POST.get('location')
+    text = query_params.get('search_bar')
+    daily_rate = query_params.get('daily_rate')
+    square_area = query_params.get('square_area')
+    room_amount = query_params.get('room_amount')
+    bedroom_amount = query_params.get('bedroom_amount')
+    convenience_items = query_params.getlist('convenience_items[]')
+    rating = query_params.get('rating')
+    location = query_params.get('location')
 
-    if not square_area_query:
-        square_area_query = 0
-    if not room_amount_query:
-        room_amount_query = 0
-    if not rating_query:
-        rating_query = 0
-    if form.is_valid():
-        if text_query:
-            apartments = apartments.annotate(
-                search=SearchVector('country__name') + SearchVector('city__name') + SearchVector('description')
-            ).filter(search__icontains=text_query)
-        if square_area_query:
-            apartments = apartments.filter(square_area__gte=int(square_area_query))
-        if daily_rate_query:
-            apartments = apartments.filter(daily_rate__lte=daily_rate_query)
-        if room_amount_query != 0:
-            apartments = apartments.filter(room_amount__gte=room_amount_query)
-            apartments = apartments.filter(bedroom_amount__gte=bedroom_amount_query)
-        if convenience_item_query:
-            apartments = apartments.filter(convenience_items__contains=convenience_item_query)
-        if rating_query != 0:
-            apartments = apartments.filter(average_rating__gte=rating_query)
-        if location_query:
-            query_point = format_coord_string_to_point(query_str=location_query)
-            apartments = apartments.annotate(distance=Distance('location', query_point)).order_by('-distance')
-        apartments = apartments.prefetch_related('apartmentphoto_set')
+    if not square_area:
+        square_area = 0
+    if not room_amount:
+        room_amount = 0
+    if not bedroom_amount:
+        bedroom_amount = 0
+    if not rating:
+        rating = 0
+    if text:
+        apartments = apartments.annotate(
+            search=SearchVector('country__name') + SearchVector('city__name') + SearchVector('description')
+        ).filter(search__icontains=text)
+    if square_area:
+        apartments = apartments.filter(square_area__gte=int(square_area))
+    if daily_rate:
+        apartments = apartments.filter(daily_rate__lte=daily_rate)
+    if room_amount != 0:
+        apartments = apartments.filter(room_amount__gte=room_amount)
+        apartments = apartments.filter(bedroom_amount__gte=bedroom_amount)
+    if convenience_items:
+        apartments = apartments.filter(convenience_items__contains=convenience_items)
+    if rating != 0:
+        apartments = apartments.filter(average_rating__gte=rating)
+    if location:
+        query_point = format_coord_string_to_point(query_str=location)
+        apartments = apartments.annotate(distance=Distance('location', query_point)).order_by('-distance')
+    apartments = apartments.prefetch_related('apartmentphoto_set')
     return apartments
 
 
 def format_coord_string_to_point(query_str):
-    query_dict = json.loads(query_str)
-    input_formatter = Proj('epsg:3857')
-    output_formatter = Proj('epsg:4326')
-    x, y = query_dict['coordinates'][0], query_dict['coordinates'][1]
-    lat, lng = transform(input_formatter, output_formatter, x, y)
-    location = Point(x=lng, y=lat, srid=4326)
+    lat_lng = query_str.split(',')
+    x = float(lat_lng[1])
+    y = float(lat_lng[0])
+    location = Point(x=x, y=y, srid=4326)
     return location
-
-
-def get_apartments_page(form, request):
-    apartments = filter_apartments_by_query(form, request)
-    paginator = Paginator(apartments, 20)
-    page_number = request.GET.get('page')
-    apartments_page = paginator.get_page(page_number)
-    return apartments_page
 
 
 def get_bookings_page(request, bookings):

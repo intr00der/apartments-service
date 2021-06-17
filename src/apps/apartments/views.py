@@ -4,7 +4,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext_lazy as _
-
+from rest_framework import viewsets
 
 import json
 
@@ -15,21 +15,25 @@ from .forms import (
     ReviewForm, PhotoForm,
 )
 from .models import Apartment, Booking, ApartmentPhoto
+from .serializers import ApartmentSerializer
 from .services import (
     verify_apartment,
     get_booked_days,
     can_review,
     get_bookings_page,
-    get_apartments_page,
+    filter_apartments_by_query,
 )
 from users.services import verified_only
 
 
-@login_required
-def home(request):
-    form = ApartmentFilteringForm(request.POST)
-    page = get_apartments_page(form, request)
-    return render(request, 'apartments/home.html', {'page': page, 'form': form})
+class HomeViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Apartment.objects.all()
+    serializer_class = ApartmentSerializer
+    form = ApartmentFilteringForm
+
+    def get_queryset(self):
+        queryset = filter_apartments_by_query(query_params=self.request.query_params)
+        return queryset
 
 
 @login_required
@@ -211,7 +215,8 @@ def post_review(request, apartment_pk):
 def apartment_bound_bookings(request, apartment_pk):
     apartment = Apartment.objects.get(pk=apartment_pk)
     if request.user.id != apartment.owner_id:
-        messages.error(request, _("You're not allowed to see the bookings on an apartment which doesn't belong to you."))
+        messages.error(request,
+                       _("You're not allowed to see the bookings on an apartment which doesn't belong to you."))
         return redirect('home')
 
     bookings = Booking.objects.filter(

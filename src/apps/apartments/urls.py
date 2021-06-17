@@ -1,6 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
-    home,
+    # home,
     register_apartment,
     unverified_apartment_list,
     apartment_detail,
@@ -12,10 +12,17 @@ from .views import (
     apartment_bound_bookings,
     photo_detail,
     add_photo,
+
+    HomeViewSet
 )
 
+from rest_framework import routers
+router = routers.DefaultRouter()
+
+router.register(r'home', HomeViewSet)
+
 urlpatterns = [
-    path('', home, name='home'),
+    path('', include(router.urls)),
     path('profile/apartments/', profile_apartment_list, name='profile-apartments-list'),
     path('profile/bookings/', bookings_list, name='bookings-list'),
     path('apartments/register/', register_apartment, name='register-apartment'),
