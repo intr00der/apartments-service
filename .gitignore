@@ -3,7 +3,7 @@ mm.sh
 .scratch
 .idea
 .git
-todo.txt
+TODO
 db.sqlite3
 .venv
 venv

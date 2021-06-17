@@ -75,16 +75,16 @@ def can_review(user, apartment):
     return True, None
 
 
-def filter_apartments_by_query(request):
+def filter_apartments_by_query(query_params):
     apartments = Apartment.objects.filter(is_verified=True)
-    text = request.query_params.get('search_bar')
-    daily_rate = request.query_params.get('daily_rate')
-    square_area = request.query_params.get('square_area')
-    room_amount = request.query_params.get('room_amount')
-    bedroom_amount = request.query_params.get('bedroom_amount')
-    convenience_items = request.query_params.getlist('convenience_items[]')
-    rating = request.query_params.get('rating')
-    location = request.query_params.get('location')
+    text = query_params.get('search_bar')
+    daily_rate = query_params.get('daily_rate')
+    square_area = query_params.get('square_area')
+    room_amount = query_params.get('room_amount')
+    bedroom_amount = query_params.get('bedroom_amount')
+    convenience_items = query_params.getlist('convenience_items[]')
+    rating = query_params.get('rating')
+    location = query_params.get('location')
 
     if not square_area:
         square_area = 0

@@ -13,4 +13,8 @@ class ApartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apartment
-        fields = '__all__'
+        fields = ('id', 'country', 'city',
+                  'description', 'square_area',
+                  'room_amount', 'bedroom_amount',
+                  'daily_rate', 'convenience_items',
+                  'average_rating', 'location')

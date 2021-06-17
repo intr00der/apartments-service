@@ -32,7 +32,7 @@ class HomeViewSet(viewsets.ReadOnlyModelViewSet):
     form = ApartmentFilteringForm
 
     def get_queryset(self):
-        queryset = filter_apartments_by_query(request=self.request)
+        queryset = filter_apartments_by_query(query_params=self.request.query_params)
         return queryset
 
 
