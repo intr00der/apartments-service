@@ -10,6 +10,8 @@ class ApartmentSerializer(serializers.ModelSerializer):
         return None
 
     distance = serializers.SerializerMethodField(required=False)
+    city = serializers.StringRelatedField()
+    country = serializers.StringRelatedField()
 
     class Meta:
         model = Apartment
@@ -17,4 +19,4 @@ class ApartmentSerializer(serializers.ModelSerializer):
                   'description', 'square_area',
                   'room_amount', 'bedroom_amount',
                   'daily_rate', 'convenience_items',
-                  'average_rating', 'location')
+                  'average_rating', 'location', 'distance')
