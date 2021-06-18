@@ -53,4 +53,4 @@ class RegisterFormTestCase(TestCase):
         wrong_data = self.cleaned_data
         wrong_data['email'] = 'bad_email'
         response = self.c.post(reverse('register'), wrong_data)
-        self.assertFormError(response, 'form', 'email', ['whatever'])
+        self.assertFormError(response, 'form', 'email', ['Enter a valid email address.'])
