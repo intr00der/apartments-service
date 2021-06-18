@@ -1,14 +1,18 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 
-from .validators import check_email_originality, match_passwords
-
-User = get_user_model()
+from .validators import (
+    check_email_originality,
+    match_passwords,
+    NameValidator,
+)
+from users.models import User
 
 
 class RegisterForm(forms.ModelForm):
+    email = forms.EmailField()
+    first_name = forms.CharField(validators=[NameValidator(), ])
+    last_name = forms.CharField(validators=[NameValidator(), ])
     password = forms.CharField(widget=forms.PasswordInput())
     confirm_password = forms.CharField(widget=forms.PasswordInput())
 

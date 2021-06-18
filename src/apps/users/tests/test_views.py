@@ -1,6 +1,9 @@
-from django.test import RequestFactory, TestCase
+from django.test import Client, RequestFactory, TestCase
+from django import forms
 
 from apartments.models import Country, City
+from django.urls import reverse
+from users.forms import RegisterForm
 from users.managers import UserManager
 from users.models import User
 from users.views import register, auth_login
@@ -13,6 +16,7 @@ class UserManagerTestCase(TestCase, UserManager):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.c = Client()
         cls.factory = RequestFactory()
         cls.usa = Country.objects.create(name='USA')
         cls.washington = City.objects.create(name='Washington', country=cls.usa)
