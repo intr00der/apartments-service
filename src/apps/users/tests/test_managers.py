@@ -8,11 +8,9 @@ import tempfile
 
 
 class UserManagerTestCase(TestCase, UserManager):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        usa = Country.objects.create(name='USA')
-        City.objects.create(name='Washington', country=usa)
+    def setUp(self):
+        self.country = Country.objects.create(name='USA')
+        self.city = City.objects.create(name='Washington', country=self.country)
 
     def test_create_user(self):
         UserManager.create_user(
@@ -23,8 +21,8 @@ class UserManagerTestCase(TestCase, UserManager):
             last_name='Doe',
             gender=1,
             birthday='1979-1-1',
-            country=1,
-            city=1,
+            country=self.country,
+            city=self.city,
             passport=tempfile.NamedTemporaryFile(suffix=".jpg").name
         )
         self.assertTrue(User.objects.filter(email='example@example.com').exists())
@@ -38,7 +36,7 @@ class UserManagerTestCase(TestCase, UserManager):
             last_name='Doe',
             gender=1,
             birthday='1979-1-1',
-            country=1,
-            city=1
+            country=self.country,
+            city=self.city
         )
         self.assertTrue(User.objects.filter(email='example_admin@example.com').exists())

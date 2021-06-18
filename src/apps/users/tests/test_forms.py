@@ -9,24 +9,23 @@ import tempfile
 
 
 class RegisterFormTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.c = Client()
-        cls.factory = RequestFactory()
-        cls.usa = Country.objects.create(name='USA')
-        cls.washington = City.objects.create(name='Washington', country=cls.usa)
-        cls.cleaned_data = {'email': 'example@example.com',
-                            'password': 'example123',
-                            'confirm_password': 'example123',
-                            'first_name': 'John',
-                            'last_name': 'Doe',
-                            'gender': 1,
-                            'birthday': '1.1.1979',
-                            'country': 1,
-                            'city': 1,
-                            'passport': tempfile.NamedTemporaryFile(suffix=".jpg").name,
-                            }
+    def setUp(self):
+        self.c = Client()
+        self.factory = RequestFactory()
+        self.country = Country.objects.create(name='USA')
+        self.city = City.objects.create(name='Washington', country=self.country)
+        self.cleaned_data = {
+            'email': 'example@example.com',
+            'password': 'example123',
+            'confirm_password': 'example123',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'gender': 1,
+            'birthday': '1.1.1979',
+            'country': self.country.id,
+            'city': self.city.id,
+            'passport': tempfile.NamedTemporaryFile(suffix=".jpg").name,
+        }
 
     def test_register_form(self):
         form = RegisterForm(data=self.cleaned_data)

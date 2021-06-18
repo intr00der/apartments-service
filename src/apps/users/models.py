@@ -40,3 +40,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         'birthday', 'country',
         'city'
     ]
+
+    def __str__(self):
+        return f'{self.email}'

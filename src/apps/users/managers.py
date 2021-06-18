@@ -11,8 +11,8 @@ class UserManager(BaseUserManager):
             last_name=last_name,
             gender=gender,
             birthday=birthday,
-            country_id=country,
-            city_id=city,
+            country_id=country.id,
+            city_id=city.id,
             passport=passport,
         )
         user.set_password(password)
@@ -27,8 +27,8 @@ class UserManager(BaseUserManager):
             last_name=last_name,
             gender=gender,
             birthday=birthday,
-            country_id=city,
-            city_id=country,
+            country_id=city.id,
+            city_id=country.id,
             is_verified=True,
             is_staff=True,
             is_superuser=True
