@@ -15,8 +15,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         OTHER = 3, _('Other')
 
     email = models.EmailField(unique=True, max_length=255, blank=False)
-    first_name = models.CharField(validators=[NameValidator], max_length=50)
-    last_name = models.CharField(validators=[NameValidator], max_length=50)
+    first_name = models.CharField(validators=[NameValidator()], max_length=50)
+    last_name = models.CharField(validators=[NameValidator()], max_length=50)
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
     country = models.ForeignKey(Country, verbose_name='country', on_delete=models.PROTECT)
@@ -40,3 +40,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         'birthday', 'country',
         'city'
     ]
+
+    def __str__(self):
+        return f'{self.email}'

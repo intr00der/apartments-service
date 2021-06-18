@@ -10,7 +10,8 @@ class NameValidator(RegexValidator):
 
 def match_passwords(password, confirm_password):
     if password != confirm_password:
-        raise forms.ValidationError({'password': "Passwords don't match."})
+        raise forms.ValidationError({'password': "Passwords don't match.",
+                                     'confirm_password': "Passwords don't match."})
 
 
 def check_email_originality(self, user):

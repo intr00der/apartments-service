@@ -27,8 +27,8 @@ def create_user_by_form(user_model, form):
         last_name=form.cleaned_data['last_name'],
         gender=form.cleaned_data['gender'],
         birthday=form.cleaned_data['birthday'],
-        country=form.cleaned_data['country'],
-        city=form.cleaned_data['city'],
+        country_id=form.cleaned_data['country'],
+        city_id=form.cleaned_data['city'],
         passport=form.cleaned_data['passport']
     )
     return user

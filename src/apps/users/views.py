@@ -59,12 +59,15 @@ def email_verification(request, uidb64, token):
 
 
 def auth_login(request):
-    form = LoginForm(request.POST)
-    if form.is_valid():
-        user = authenticate_user_by_form(form=form, request=request)
-        if user:
-            login(request, user)
-            return redirect('home')
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate_user_by_form(form=form, request=request)
+            if user:
+                login(request, user)
+                return redirect('home')
+    else:
+        form = LoginForm()
     return render(request, 'users/login.html', {'form': form})
 
 

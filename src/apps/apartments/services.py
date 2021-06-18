@@ -9,9 +9,6 @@ from datetime import (
     timedelta,
     datetime
 )
-from pyproj import Proj, transform
-
-import json
 
 
 def verify_apartment(apartment_pk):
@@ -104,6 +101,7 @@ def filter_apartments_by_query(query_params):
         apartments = apartments.filter(daily_rate__lte=daily_rate)
     if room_amount != 0:
         apartments = apartments.filter(room_amount__gte=room_amount)
+    if bedroom_amount != 0:
         apartments = apartments.filter(bedroom_amount__gte=bedroom_amount)
     if convenience_items:
         apartments = apartments.filter(convenience_items__contains=convenience_items)
